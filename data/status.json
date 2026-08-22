@@ -6,8 +6,8 @@
   },
   "requestedAt": "2026-08-22T04:37:13.000Z",
   "startedAt": "2026-08-22T04:37:29.014Z",
-  "running": true,
-  "finishedAt": null,
+  "running": false,
+  "finishedAt": "2026-08-22T04:38:45.490Z",
   "repos": [
     {
       "name": "BookChecker",
