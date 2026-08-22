@@ -188,7 +188,7 @@
     },
     {
       "name": "t2s_agent",
-      "state": "pending",
+      "state": "running",
       "commits": []
     },
     {
