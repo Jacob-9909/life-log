@@ -21,14 +21,13 @@ body {
 }
 .hud-top { display: flex; align-items: center; gap: 10px; }
 .sidebar h1 {
-  font-size: 17px;
+  font-size: 18px;
   margin: 0;
-  letter-spacing: 0.06em;
-  background: linear-gradient(90deg, #a78bfa, #22d3ee);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.45));
+  letter-spacing: 0.08em;
+  color: #d8ccff;
+  text-shadow:
+    0 0 14px rgba(167, 139, 250, 0.9),
+    0 0 30px rgba(34, 211, 238, 0.4);
 }
 .level-chip {
   font-family: var(--font-pixel), monospace;
@@ -47,6 +46,9 @@ body {
   margin-top: 6px;
   letter-spacing: 0.04em;
 }
+
+.tier-next { color: #6b7280; }
+.tier-next b { color: #67e8f9; font-weight: 700; }
 .xp-bar {
   height: 7px;
   border-radius: 4px;
@@ -355,11 +357,6 @@ body {
 
 /* ===== 게임 연출 ===== */
 /* Shimmer 광택 타이틀 */
-.sidebar h1 {
-  background: linear-gradient(100deg, #a78bfa 20%, #e9d5ff 40%, #67e8f9 50%, #e9d5ff 60%, #a78bfa 80%);
-  background-size: 200% auto;
-  animation: shine 4s linear infinite;
-}
 @keyframes shine { to { background-position: -200% center; } }
 
 /* 보스 HP바 */

@@ -269,6 +269,7 @@ export default function Home() {
     [1, "잡몹 사냥꾼"], [5, "모험가"], [10, "기사단원"], [15, "대마법사"], [20, "전설"],
   ];
   const tier = [...TIERS].reverse().find(([lv]) => level >= Number(lv))[1];
+  const nextTier = [...TIERS].find(([lv]) => level < Number(lv)) || null;
 
   // 업적 정의 (전부 클라이언트 계산)
   const commitTotal = status.repos.reduce((s, r) => s + (r.commits?.length || 0), 0);
@@ -315,9 +316,16 @@ export default function Home() {
           <h1>⚔️ LIFE LOG</h1>
           <span className="level-chip">Lv.{level}</span>
         </div>
-        <div className="tier-label">{tier} · 다음 레벨까지 {xpToNext}일</div>
         <div className="xp-bar" title={`다음 레벨까지 ${xpToNext}일`}>
           <div className="xp-fill" style={{ width: `${xpPercent}%` }} />
+        </div>
+        <div className="tier-label">
+          🏅 {tier}
+          {nextTier && (
+            <span className="tier-next">
+              {" "}→ 다음 칭호 <b>{nextTier[1]}</b> (Lv.{nextTier[0]} · {(Number(nextTier[0]) - level) * 5}일 남음)
+            </span>
+          )}
         </div>
         <div className="week-label">{week ? `${week} · 수집 기간` : "작업 현황"}</div>
         <button className="btn" disabled={busy || running} onClick={() => trigger("fetch")}>
