@@ -19,6 +19,10 @@
     <string>main</string>
     <key>POLL_MS</key>
     <string>15000</string>
+    <key>NVIDIA_API_KEY</key>
+    <string>__NVIDIA_API_KEY__</string>
+    <key>NIM_MODEL</key>
+    <string>meta/llama-3.3-70b-instruct</string>
   </dict>
   <key>RunAtLoad</key>
   <true/>

@@ -16,6 +16,9 @@ const BRANCH = process.env.GITHUB_BRANCH || "main";
 const DEVELOP_DIR = process.env.DEVELOP_DIR || path.join(HOME, "Develop");
 const JOB_DIR = process.env.JOB_DIR || path.join(HOME, "job");
 const POLL_MS = Number(process.env.POLL_MS || 15000);
+// NVIDIA NIM (OpenAI 호환 API)
+const NIM_BASE = process.env.NIM_BASE_URL || "https://integrate.api.nvidia.com/v1";
+const NIM_MODEL = process.env.NIM_MODEL || "meta/llama-3.3-70b-instruct";
 const AUTHORS = /whjeong@didim365\.com|cj0336j@gmail\.com|Woohyuck Jeong|Jacob/;
 const API = "https://api.github.com";
 const TOKEN = process.env.GITHUB_TOKEN;
@@ -138,6 +141,52 @@ async function runFetch(command) {
   console.log(`[fetch] ${key} 완료`);
 }
 
+// ---- NVIDIA NIM 요약 ----
+async function nimSummarize(week, notes, repos) {
+  if (!process.env.NVIDIA_API_KEY) return null;
+  const material = [
+    "## 이번 주 업무 메모 (사용자 직접 입력)",
+    ...notes.map((n) => `- [${n.at.slice(5, 10)}] ${n.text}`),
+    "",
+    "## Git 커밋 로그 (repo별, 형식: MM-DD HH:MM 메시지)",
+  ];
+  for (const r of repos.filter((x) => x.commits.length)) {
+    material.push(`### ${r.name} (${r.commits.length}건)`);
+    material.push(...r.commits.map((c) => c.replace(/^[^|]*\|/, "")));
+    material.push("");
+  }
+
+  const res = await fetch(`${NIM_BASE}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.NVIDIA_API_KEY}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      model: NIM_MODEL,
+      temperature: 0.3,
+      max_tokens: 2048,
+      messages: [
+        {
+          role: "system",
+          content:
+            "너는 취업준비 중인 개발자의 주간 업무일지 작성 도우미다. 아래 재료(업무 메모 + git 커밋 로그)를 바탕으로 마크다운 주간 정리를 작성한다.\n" +
+            "규칙:\n" +
+            "1. '## 이번주 업무' 헤더 아래에 repo별/주제별로 묶어 서술형 문단으로 정리한다. 단순 나열 금지 — 커밋 로그의 맥락을 읽고 무엇을 왜 했는지 기술한다.\n" +
+            "2. '## 자소서 소재 후보 (STAR 초안)' 헤더 아래에 자기소개서에 쓸 만한 소재를 상황-행동-결과로 가볍게 1~3개 초안 작성한다. 재료가 부족하면 이 섹션은 생략한다.\n" +
+            "3. 사실을 낭만화하지 않는다. 재료에 없는 일을 만들어내지 않는다. 한국어로 쓴다.",
+        },
+        { role: "user", content: `${week} 주간 정리 재료:\n\n${material.join("\n")}` },
+      ],
+    }),
+    signal: AbortSignal.timeout(300000), // NIM 응답이 느림 — 5분 대기
+  });
+  if (!res.ok) throw new Error(`NIM ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const json = await res.json();
+  return json.choices?.[0]?.message?.content?.trim() || null;
+}
+
 async function runWeekly(command) {
   const { key, mondayISO } = command.week === weekInfo().key ? weekInfo() : weekInfo(new Date(`${command.week}-1`));
   // 최신 커밋 다시 수집
@@ -158,16 +207,32 @@ async function runWeekly(command) {
   const lines = [
     `# ${command.week} 주간 정리`,
     "",
-    `> 생성: ${today} · life-log 대시보드에서 자동 생성`,
-    "",
-    "## 이번주 업무",
+    `> 생성: ${today} · life-log 대시보드에서 자동 생성 (LLM: ${NIM_MODEL})`,
     "",
   ];
-  for (const n of notes) {
-    lines.push(`- [${n.at.slice(5, 16).replace("T", " ")}] ${n.text.replace(/\n/g, "\n  ")}`);
+
+  // NVIDIA NIM으로 서술형 요약 생성 (키 없음/실패 시 템플릿 폴백)
+  let llmOk = false;
+  try {
+    const summary = await nimSummarize(command.week, notes, repos);
+    if (summary) {
+      lines.push(summary, "");
+      llmOk = true;
+      console.log("[weekly] NIM 요약 생성 완료");
+    }
+  } catch (e) {
+    console.error("[weekly] NIM 호출 실패, 템플릿으로 대체:", e.message);
   }
-  if (!notes.length) lines.push("(입력된 업무 메모 없음)");
-  lines.push("", "## Git 커밋 요약", "");
+
+  if (!llmOk) {
+    lines.push("## 이번주 업무", "");
+    for (const n of notes) {
+      lines.push(`- [${n.at.slice(5, 16).replace("T", " ")}] ${n.text.replace(/\n/g, "\n  ")}`);
+    }
+    if (!notes.length) lines.push("(입력된 업무 메모 없음)");
+  }
+
+  lines.push("## Git 커밋 요약", "");
   for (const r of repos.filter((x) => x.commits.length)) {
     lines.push(`### ${r.name} — ${r.commits.length}건`, "", "```");
     lines.push(...r.commits.map((c) => c.replace(/^[^|]*\|[^|]*\|/, "")));
