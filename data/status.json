@@ -217,8 +217,10 @@
     },
     {
       "name": "wiki",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "43c46df|08-17 16:46|Develop 로컬 프로젝트 17개 딥다이브 ingest"
+      ]
     }
   ]
 }
