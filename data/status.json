@@ -198,7 +198,7 @@
     },
     {
       "name": "t2sql-package",
-      "state": "pending",
+      "state": "running",
       "commits": []
     },
     {
