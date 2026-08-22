@@ -140,6 +140,10 @@ export default function Home() {
   const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   const doneDays = Object.keys(calendar).filter((k) => calendar[k]).length;
   const monthDone = cal.cells.filter((c) => c && calendar[c.iso]).length;
+  // 레벨 시스템: 기록 5일당 1레벨
+  const level = Math.floor(doneDays / 5) + 1;
+  const xpPercent = ((doneDays % 5) / 5) * 100;
+  const xpToNext = 5 - (doneDays % 5);
 
   // 오늘부터 거꾸로 연속 기록일 수 (스트릭)
   const streak = (() => {
@@ -183,7 +187,13 @@ export default function Home() {
   return (
     <div className="app">
       <aside className="sidebar">
-        <h1>Life Log</h1>
+        <div className="hud-top">
+          <h1>⚔️ LIFE LOG</h1>
+          <span className="level-chip">Lv.{level}</span>
+        </div>
+        <div className="xp-bar" title={`다음 레벨까지 ${xpToNext}일`}>
+          <div className="xp-fill" style={{ width: `${xpPercent}%` }} />
+        </div>
         <div className="week-label">{week ? `${week} · 수집 기간` : "작업 현황"}</div>
         <button className="btn" disabled={busy || running} onClick={() => trigger("fetch")}>
           {running ? "스캔 중..." : "▶ Fetch 실행"}
