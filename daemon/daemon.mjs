@@ -80,6 +80,31 @@ function weekInfo(now = new Date()) {
   };
 }
 
+// ---- 수집 기간 계산: 마지막 기록일 다음날 ~ 오늘 (KST). 기록이 없으면 이번 주 월요일 ----
+function computeWindow() {
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const today = new Date(Date.now() + 9 * 3600 * 1000);
+  const todayISO = iso(today);
+  let start;
+  try {
+    const cal = getContent("data/calendar.json")?.content ?? {};
+    const lastRecorded = Object.keys(cal)
+      .filter((k) => cal[k] && k < todayISO)
+      .sort()
+      .pop();
+    if (lastRecorded) {
+      const d = new Date(`${lastRecorded}T00:00:00Z`);
+      d.setUTCDate(d.getUTCDate() + 1);
+      start = iso(d);
+    } else {
+      start = weekInfo().mondayISO;
+    }
+  } catch {
+    start = weekInfo().mondayISO;
+  }
+  return { start, todayISO };
+}
+
 // ---- repo 탐색 ----
 function findRepos() {
   const repos = [];
@@ -108,37 +133,40 @@ function collectCommits(dir, mondayISO) {
 
 // ---- 메인 액션 ----
 async function runFetch(command) {
-  const { key, mondayISO } = weekInfo();
+  const { start, todayISO } = computeWindow();
+  const periodLabel = `${start.slice(5)} ~ ${todayISO.slice(5)}`;
+  console.log(`[fetch] 수집 기간: ${start} ~ ${todayISO}`);
   const repos = findRepos();
   const status = {
-    week: key,
+    week: periodLabel,
+    period: { start, end: todayISO },
     requestedAt: command.requestedAt,
     startedAt: new Date().toISOString(),
     running: true,
     finishedAt: null,
     repos: repos.map((r) => ({ name: r.name, state: "pending", commits: [] })),
   };
-  await putContent("data/status.json", status, `chore(status): ${key} 스캔 시작`);
+  await putContent("data/status.json", status, `chore(status): ${periodLabel} 스캔 시작`);
 
   for (const r of status.repos) {
     r.state = "running";
-    await putContent("data/status.json", status, `chore(status): ${key} ${r.name} 스캔 중`);
+    await putContent("data/status.json", status, `chore(status): ${periodLabel} ${r.name} 스캔 중`);
     const found = repos.find((x) => x.name === r.name);
     try {
       execFileSync("git", ["-C", found.dir, "fetch", "--all", "--quiet"], { timeout: 120000 });
-      r.commits = collectCommits(found.dir, mondayISO);
+      r.commits = collectCommits(found.dir, start);
       r.state = "done";
     } catch (e) {
       r.state = "done";
       r.error = String(e.message).slice(0, 200);
     }
-    await putContent("data/status.json", status, `chore(status): ${key} ${r.name} 완료 (+${r.commits.length})`);
+    await putContent("data/status.json", status, `chore(status): ${periodLabel} ${r.name} 완료 (+${r.commits.length})`);
   }
 
   status.running = false;
   status.finishedAt = new Date().toISOString();
-  await putContent("data/status.json", status, `chore(status): ${key} 스캔 완료`);
-  console.log(`[fetch] ${key} 완료`);
+  await putContent("data/status.json", status, `chore(status): ${periodLabel} 스캔 완료`);
+  console.log(`[fetch] ${periodLabel} 완료`);
 }
 
 // ---- NVIDIA NIM 요약 ----
@@ -188,33 +216,38 @@ async function nimSummarize(week, notes, repos) {
 }
 
 async function runWeekly(command) {
-  const { key, mondayISO } = command.week === weekInfo().key ? weekInfo() : weekInfo(new Date(`${command.week}-1`));
-  // 최신 커밋 다시 수집
+  const { start, todayISO } = computeWindow();
+  // 최신 커밋 다시 수집 (기간: 마지막 기록일 다음날 ~ 오늘)
   const repos = findRepos().map((r) => ({
     name: r.name,
     commits: (() => {
       try {
         execFileSync("git", ["-C", r.dir, "fetch", "--all", "--quiet"], { timeout: 120000 });
       } catch {}
-      return collectCommits(r.dir, mondayISO);
+      return collectCommits(r.dir, start);
     })(),
   }));
 
-  const noteFile = getContent(`data/notes/${command.week}.json`);
-  const notes = noteFile?.content?.notes ?? [];
+  // 마지막 정리 생성 이후에 입력된 보충 메모만 사용
+  const meta = getContent("data/meta.json")?.content ?? {};
+  const lastGeneratedAt = meta.lastGeneratedAt ?? null;
+  const allNotes = getContent("data/notes/all.json")?.content?.notes ?? [];
+  const notes = lastGeneratedAt
+    ? allNotes.filter((n) => n.at > lastGeneratedAt)
+    : allNotes;
+  console.log(`[weekly] 기간 ${start}~${todayISO}, 메모 ${notes.length}건 (전체 ${allNotes.length})`);
 
-  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   const lines = [
-    `# ${command.week} 주간 정리`,
+    `# 업무 정리 (${start} ~ ${todayISO})`,
     "",
-    `> 생성: ${today} · life-log 대시보드에서 자동 생성 (LLM: ${NIM_MODEL})`,
+    `> 생성: ${todayISO} · life-log 대시보드에서 자동 생성 (LLM: ${NIM_MODEL})`,
     "",
   ];
 
   // NVIDIA NIM으로 서술형 요약 생성 (키 없음/실패 시 템플릿 폴백)
   let llmOk = false;
   try {
-    const summary = await nimSummarize(command.week, notes, repos);
+    const summary = await nimSummarize(`${start} ~ ${todayISO}`, notes, repos);
     if (summary) {
       lines.push(summary, "");
       llmOk = true;
@@ -225,11 +258,11 @@ async function runWeekly(command) {
   }
 
   if (!llmOk) {
-    lines.push("## 이번주 업무", "");
+    lines.push("## 기간 업무", "");
     for (const n of notes) {
       lines.push(`- [${n.at.slice(5, 16).replace("T", " ")}] ${n.text.replace(/\n/g, "\n  ")}`);
     }
-    if (!notes.length) lines.push("(입력된 업무 메모 없음)");
+    if (!notes.length) lines.push("(입력된 보충 메모 없음)");
   }
 
   lines.push("## Git 커밋 요약", "");
@@ -238,16 +271,18 @@ async function runWeekly(command) {
     lines.push(...r.commits.map((c) => c.replace(/^[^|]*\|[^|]*\|/, "")));
     lines.push("```", "");
   }
-  if (!repos.some((x) => x.commits.length)) lines.push("(해당 주 커밋 없음)", "");
+  if (!repos.some((x) => x.commits.length)) lines.push("(해당 기간 커밋 없음)", "");
 
   const md = lines.join("\n");
-  // 로컬 job 폴더에 저장
+  // 로컬 job 폴더에 저장 (파일명: 시작일_종료일)
+  const baseName = `${start}_${todayISO}`;
   const outDir = path.join(JOB_DIR, "docs", "10_주간정리");
   fs.mkdirSync(outDir, { recursive: true });
-  fs.writeFileSync(path.join(outDir, `${command.week}.md`), md);
-  // 웹에서 볼 수 있게 repo에도 사본 push
-  await putContent(`data/weekly/${command.week}.md.json`, { markdown: md }, `docs(weekly): ${command.week} 정리 생성`);
-  console.log(`[weekly] ${outDir}/${command.week}.md 저장 완료`);
+  fs.writeFileSync(path.join(outDir, `${baseName}.md`), md);
+  // 웹에서 볼 수 있게 repo에도 사본 push + 소비한 메모 기록 갱신
+  await putContent(`data/weekly/${baseName}.md.json`, { markdown: md }, `docs(weekly): ${baseName} 정리 생성`);
+  await putContent("data/meta.json", { ...meta, lastGeneratedAt: new Date().toISOString() }, "chore(meta): 정리 생성 시각 갱신");
+  console.log(`[weekly] ${outDir}/${baseName}.md 저장 완료`);
 }
 
 // ---- 시작 시: 기존 09_업무일지 파일들을 읽어 달력에 과거 기록 시드 ----

@@ -12,7 +12,13 @@ export default function Home() {
   const [gateError, setGateError] = useState("");
 
   const [repos, setRepos] = useState([]);
-  const [status, setStatus] = useState({ repos: [], finishedAt: null, running: false, week: "" });
+  const [status, setStatus] = useState({
+    repos: [],
+    finishedAt: null,
+    running: false,
+    week: "",
+    period: null as { start: string; end: string } | null,
+  });
   const [notes, setNotes] = useState([]);
   const [calendar, setCalendar] = useState({});
   const [monthOffset, setMonthOffset] = useState(0);
@@ -167,7 +173,7 @@ export default function Home() {
     <div className="app">
       <aside className="sidebar">
         <h1>Life Log</h1>
-        <div className="week-label">{week ? `${week} · 이번 주 작업 현황` : "이번 주 작업 현황"}</div>
+        <div className="week-label">{week ? `${week} · 수집 기간` : "작업 현황"}</div>
         <button className="btn" disabled={busy || running} onClick={() => trigger("fetch")}>
           {running ? "스캔 중..." : "▶ Fetch 실행"}
         </button>
@@ -247,11 +253,11 @@ export default function Home() {
           </div>
         </section>
 
-        <h2>이번 주에 한 일</h2>
+        <h2>주간 정리 보충 메모</h2>
         <div className="log-scroll">
           {!notes.length && (
             <div className="hint" style={{ margin: "auto" }}>
-              이번 주에 한 업무를 아래에 적어보세요. 커밋 내역과 함께 주간 정리 .md로 저장됩니다.
+              커밋으로 안 담기는 내용을 적어두면 주간 정리 생성 시 함께 반영됩니다. (미팅·학습·의사결정 등)
             </div>
           )}
           {notes.map((n, i) => (
@@ -281,18 +287,18 @@ export default function Home() {
                   sendNote();
                 }
               }}
-              placeholder="오늘 한 일 입력... (Enter 전송)"
+              placeholder="보충할 내용 입력... (Enter 추가)"
               rows={2}
             />
-            <button className="btn" onClick={sendNote}>전송</button>
+            <button className="btn" onClick={sendNote}>추가</button>
           </div>
           <button
             className="btn generate"
             disabled={busy}
             onClick={() => trigger("generate-weekly")}
-            title="로컬 맥의 데몬이 ~/job/docs/10_주간정리/ 에 md 파일을 생성합니다"
+            title="마지막 정리 이후 커밋 + 보충 메모로 NIM이 주간 정리를 작성해 ~/job/docs/10_주간정리/ 에 저장합니다"
           >
-            📝 주간 정리 생성 ({week}) → job 폴더에 .md 저장
+            📝 주간 정리 생성{status.period ? ` (${status.period.start.slice(5)} ~ ${status.period.end.slice(5)})` : ""} → job 폴더에 .md 저장
           </button>
         </div>
       </main>
