@@ -140,6 +140,17 @@ export default function Home() {
     wasRunningRef.current = !!status.running;
   }, [status.running, status.repos.length]);
 
+  // 레벨업 감지 → 모달 + 컨페티
+  const prevLevelRef = useRef(level);
+  useEffect(() => {
+    if (level > prevLevelRef.current && prevLevelRef.current > 0) {
+      sessionStorage.setItem(`lv-${level}`, "1");
+      setLevelUp(level);
+      fireConfetti();
+    }
+    prevLevelRef.current = level;
+  }, [level]);
+
   // 스트릭 마일스톤 도달 시 축하 배너 (세션당 1회)
   useEffect(() => {
     if (streak && MILESTONES.includes(streak)) {
@@ -258,17 +269,6 @@ export default function Home() {
     [1, "잡몹 사냥꾼"], [5, "모험가"], [10, "기사단원"], [15, "대마법사"], [20, "전설"],
   ];
   const tier = [...TIERS].reverse().find(([lv]) => level >= Number(lv))[1];
-
-  // 레벨업 감지 → 모달 + 컨페티
-  const prevLevelRef = useRef(level);
-  useEffect(() => {
-    if (level > prevLevelRef.current && prevLevelRef.current > 0) {
-      sessionStorage.setItem(`lv-${level}`, "1");
-      setLevelUp(level);
-      fireConfetti();
-    }
-    prevLevelRef.current = level;
-  }, [level]);
 
   // 업적 정의 (전부 클라이언트 계산)
   const commitTotal = status.repos.reduce((s, r) => s + (r.commits?.length || 0), 0);
