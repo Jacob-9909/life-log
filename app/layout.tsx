@@ -10,6 +10,12 @@ const pixel = Press_Start_2P({
 export const metadata = {
   title: "Life Log",
   description: "주간 업무 정리 대시보드",
+  manifest: "/manifest.json",
+  icons: { icon: "/icon.svg" },
+};
+
+export const viewport = {
+  themeColor: "#7c3aed",
 };
 
 export default function RootLayout({ children }) {

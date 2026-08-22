@@ -40,3 +40,25 @@ export async function putContent(path, content, message) {
   if (!res.ok) throw new Error(`GitHub PUT ${path}: ${res.status} ${await res.text()}`);
   return res.json();
 }
+
+// 디렉터리 목록 조회 (주간 정리 파일 나열용)
+export async function listDir(path) {
+  const res = await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, {
+    headers: headers(),
+    cache: "no-store",
+  });
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error(`GitHub LIST ${path}: ${res.status}`);
+  return res.json(); // [{ name, path, sha, ... }]
+}
+
+export async function getRawContent(path) {
+  const res = await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, {
+    headers: headers(),
+    cache: "no-store",
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GitHub GET ${path}: ${res.status}`);
+  const json = await res.json();
+  return Buffer.from(json.content, "base64").toString("utf8");
+}

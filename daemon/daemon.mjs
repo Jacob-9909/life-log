@@ -170,6 +170,7 @@ async function runFetch(command) {
   status.running = false;
   status.finishedAt = new Date().toISOString();
   await putContent("data/status.json", status, `chore(status): ${periodLabel} 스캔 완료`);
+  notify("⚔️ 던전 클리어!", `${periodLabel} 스캔 완료 — 커밋 ${status.repos.reduce((s, r) => s + r.commits.length, 0)}건 수집`);
   console.log(`[fetch] ${periodLabel} 완료`);
 }
 
@@ -221,6 +222,25 @@ async function nimSummarize(week, notes, repos) {
   if (!res.ok) throw new Error(`NIM ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const json = await res.json();
   return json.choices?.[0]?.message?.content?.trim() || null;
+}
+
+// ---- 알림 (macOS 알림 + Discord webhook 옵션) ----
+function notify(title, body) {
+  try {
+    execFileSync("osascript", [
+      "-e", `display notification "${body.replace(/"/g, "'")}" with title "${title}"`,
+    ], { timeout: 10000 });
+  } catch {}
+  const hook = process.env.DISCORD_WEBHOOK_URL;
+  if (hook) {
+    try {
+      execFileSync("curl", [
+        "-sS", "-X", "POST", hook,
+        "-H", "Content-Type: application/json",
+        "-d", JSON.stringify({ content: `**${title}**\n${body}` }),
+      ], { timeout: 15000 });
+    } catch {}
+  }
 }
 
 async function runWeekly(command) {
@@ -290,6 +310,19 @@ async function runWeekly(command) {
   // 웹에서 볼 수 있게 repo에도 사본 push + 소비한 메모 기록 갱신
   await putContent(`data/weekly/${baseName}.md.json`, { markdown: md }, `docs(weekly): ${baseName} 정리 생성`);
   await putContent("data/meta.json", { ...meta, lastGeneratedAt: new Date().toISOString() }, "chore(meta): 정리 생성 시각 갱신");
+
+  // 스토리뱅크 등록 초안: STAR 섹션을 별도 초안 파일에 적립
+  const starMatch = md.match(/## 자소서 소재 후보[^\n]*\n([\s\S]*?)(?=\n## |$)/);
+  if (starMatch && starMatch[1].trim()) {
+    const draftPath = path.join(JOB_DIR, "docs", "03_스토리뱅크_초안.md");
+    fs.appendFileSync(
+      draftPath,
+      `\n\n<!-- ${baseName} 자동 추출 -->\n## ${baseName}\n${starMatch[1].trim()}\n`
+    );
+    console.log(`[weekly] 스토리뱅크 초안 적립 → ${draftPath}`);
+  }
+
+  notify("📝 주간 정리 완료", `${start} ~ ${todayISO} 정리가 job 폴더에 저장되었습니다.`);
   console.log(`[weekly] ${outDir}/${baseName}.md 저장 완료`);
 }
 
@@ -319,6 +352,7 @@ async function seedCalendar() {
 
 // ---- 루프 ----
 let lastProcessedAt = null;
+let autoGenDay = null;
 try {
   const cur = getContent("data/command.json");
   lastProcessedAt = cur?.content?.requestedAt ?? null;
@@ -330,6 +364,26 @@ seedCalendar().catch((e) => console.error("[calendar] 시드 실패:", e));
 
 setInterval(async () => {
   if (!TOKEN) return;
+
+  // 매일 20:30(KST) 자동 주간 정리 생성 (그날 아직 미생성일 때만)
+  try {
+    const kstNow = new Date(Date.now() + 9 * 3600 * 1000);
+    const todayISO = kstNow.toISOString().slice(0, 10);
+    const hhmm = kstNow.toISOString().slice(11, 16);
+    if (hhmm >= "20:30" && autoGenDay !== todayISO) {
+      const m = getContent("data/meta.json")?.content ?? {};
+      if ((m.lastGeneratedAt || "").slice(0, 10) !== todayISO) {
+        autoGenDay = todayISO;
+        console.log("[daemon] 자동 주간 정리 생성 시작");
+        await runWeekly({ action: "generate-weekly", week: todayISO });
+      } else {
+        autoGenDay = todayISO;
+      }
+    }
+  } catch (e) {
+    console.error("[daemon] 자동 생성 오류:", e.message || e);
+  }
+
   const cmd = getContent("data/command.json");
   if (!cmd?.content?.requestedAt) return;
   if (lastProcessedAt && cmd.content.requestedAt <= lastProcessedAt) return;

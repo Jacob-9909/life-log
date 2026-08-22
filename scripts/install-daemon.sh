@@ -6,6 +6,7 @@ set -euo pipefail
 REPO="${1:?사용법: install-daemon.sh <owner/repo> [github-token]}"
 TOKEN="${2:-$(gh auth token)}"
 NVIDIA_API_KEY="${NVIDIA_API_KEY:-}"
+DISCORD_WEBHOOK_URL="${DISCORD_WEBHOOK_URL:-}"
 
 if [[ -z "$TOKEN" ]]; then
   echo "GitHub 토큰을 찾을 수 없습니다. 인자로 넘기거나 gh auth login 후 재실행하세요."
@@ -23,6 +24,7 @@ sed -e "s|__NODE__|$NODE_BIN|g" \
     -e "s|__REPO__|$REPO|g" \
     -e "s|__TOKEN__|$TOKEN|g" \
     -e "s|__NVIDIA_API_KEY__|$NVIDIA_API_KEY|g" \
+    -e "s|__DISCORD_WEBHOOK_URL__|$DISCORD_WEBHOOK_URL|g" \
     "$DIR/daemon/com.jacob.life-log.daemon.plist.template" > "$PLIST_DST"
 
 launchctl unload "$PLIST_DST" 2>/dev/null || true

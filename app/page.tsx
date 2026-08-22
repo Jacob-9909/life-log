@@ -65,6 +65,12 @@ export default function Home() {
   const [milestone, setMilestone] = useState(null);
   const [levelUp, setLevelUp] = useState(null);
   const [meta, setMeta] = useState({ lastGeneratedAt: null });
+  const [toast, setToast] = useState(null);
+  const [weeklyOpen, setWeeklyOpen] = useState(false);
+  const [weeklyList, setWeeklyList] = useState([]);
+  const [weeklyMd, setWeeklyMd] = useState(null);
+  const [editingAt, setEditingAt] = useState(null);
+  const [editText, setEditText] = useState("");
   const wasRunningRef = useRef(false);
   const cal = calendarGrid();
   const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
@@ -155,6 +161,35 @@ export default function Home() {
     prevLevelRef.current = level;
   }, [level]);
 
+  // 업적 정의 (전부 클라이언트 계산, 서버 데이터 기반 — 기기 무관)
+  const commitTotal = status.repos.reduce((s, r) => s + (r.commits?.length || 0), 0);
+  const hasFullScan = !!status.finishedAt && status.repos.length > 0;
+  const achievements = [
+    { icon: "👣", name: "첫걸음", desc: "첫 업무 기록", ok: doneDays >= 1 },
+    { icon: "🔥", name: "일주일 개근", desc: "7일 연속 기록", ok: streak >= 7 },
+    { icon: "🌋", name: "한 달 개근", desc: "30일 연속 기록", ok: streak >= 30 },
+    { icon: "💯", name: "백전백승", desc: "누적 100일", ok: doneDays >= 100 },
+    { icon: "🏆", name: "던전 클리어", desc: "Fetch 전체 완료", ok: hasFullScan },
+    { icon: "📜", name: "첫 주간 정리", desc: "정리 생성 1회", ok: !!meta.lastGeneratedAt },
+    { icon: "⚔️", name: "커밋 헌터", desc: "기간 내 커밋 50+", ok: commitTotal >= 50 },
+    { icon: "🌙", name: "야행성", desc: "이번 달 기록 15+", ok: monthDone >= 15 },
+  ];
+  const unlockedCount = achievements.filter((a) => a.ok).length;
+
+  // 업적 해금 시 토스트 (세션당 1회)
+  const prevAchRef = useRef(null);
+  useEffect(() => {
+    const nowUnlocked = achievements.filter((a) => a.ok);
+    const prev = prevAchRef.current;
+    if (prev && nowUnlocked.length > prev.length) {
+      const fresh = nowUnlocked[nowUnlocked.length - 1];
+      setToast(fresh);
+      fireConfetti();
+      setTimeout(() => setToast(null), 5000);
+    }
+    prevAchRef.current = nowUnlocked;
+  }, [achievements.map((a) => a.ok).join(",")]);
+
   // 스트릭 마일스톤 도달 시 축하 배너 (세션당 1회)
   useEffect(() => {
     if (streak && MILESTONES.includes(streak)) {
@@ -209,6 +244,42 @@ export default function Home() {
       const data = await res.json();
       setNotes(data.notes || []);
       loadCalendar();
+    }
+  }
+
+  async function openWeekly() {
+    setWeeklyOpen(true);
+    setWeeklyMd(null);
+    const res = await fetch("/api/weekly", { headers: authHeaders(code) });
+    if (res.ok) {
+      const data = await res.json();
+      setWeeklyList(data.files || []);
+    }
+  }
+
+  async function loadWeekly(file) {
+    const res = await fetch(`/api/weekly?file=${encodeURIComponent(file)}.md.json`, { headers: authHeaders(code) });
+    if (res.ok) {
+      const data = await res.json();
+      setWeeklyMd({ file, markdown: data.markdown });
+    }
+  }
+
+  function startEdit(n) {
+    setEditingAt(n.at);
+    setEditText(n.text);
+  }
+
+  async function saveEdit() {
+    const res = await fetch("/api/notes", {
+      method: "PATCH",
+      headers: authHeaders(code),
+      body: JSON.stringify({ at: editingAt, text: editText }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setNotes(data.notes || []);
+      setEditingAt(null);
     }
   }
 
@@ -275,20 +346,6 @@ export default function Home() {
   const tier = [...TIERS].reverse().find(([lv]) => level >= Number(lv))[1];
   const nextTier = [...TIERS].find(([lv]) => level < Number(lv)) || null;
 
-  // 업적 정의 (전부 클라이언트 계산, 서버 데이터 기반 — 기기 무관)
-  const commitTotal = status.repos.reduce((s, r) => s + (r.commits?.length || 0), 0);
-  const hasFullScan = !!status.finishedAt && status.repos.length > 0;
-  const achievements = [
-    { icon: "👣", name: "첫걸음", desc: "첫 업무 기록", ok: doneDays >= 1 },
-    { icon: "🔥", name: "일주일 개근", desc: "7일 연속 기록", ok: streak >= 7 },
-    { icon: "🌋", name: "한 달 개근", desc: "30일 연속 기록", ok: streak >= 30 },
-    { icon: "💯", name: "백전백승", desc: "누적 100일", ok: doneDays >= 100 },
-    { icon: "🏆", name: "던전 클리어", desc: "Fetch 전체 완료", ok: hasFullScan },
-    { icon: "📜", name: "첫 주간 정리", desc: "정리 생성 1회", ok: !!meta.lastGeneratedAt },
-    { icon: "⚔️", name: "커밋 헌터", desc: "기간 내 커밋 50+", ok: commitTotal >= 50 },
-    { icon: "🌙", name: "야행성", desc: "이번 달 기록 15+", ok: monthDone >= 15 },
-  ];
-  const unlockedCount = achievements.filter((a) => a.ok).length;
 
   // 히트맵 농도: 날짜별 메모 개수
   const notesByDay = {};
@@ -300,6 +357,42 @@ export default function Home() {
   return (
     <div className="app">
       <div className="crt-overlay" aria-hidden />
+      {toast && (
+        <div className="ach-toast">
+          <span className="ach-toast-icon">{toast.icon}</span>
+          <div>
+            <div className="ach-toast-title">업적 달성!</div>
+            <div className="ach-toast-name">{toast.name} — {toast.desc}</div>
+          </div>
+        </div>
+      )}
+      {weeklyOpen && (
+        <div className="levelup-modal" onClick={() => setWeeklyOpen(false)}>
+          <div className="weekly-box" onClick={(e) => e.stopPropagation()}>
+            <div className="card-head">
+              <h2>📚 지난 주간 정리</h2>
+              <button className="btn secondary small" onClick={() => setWeeklyOpen(false)}>닫기</button>
+            </div>
+            <div className="weekly-body">
+              <ul className="weekly-list">
+                {!weeklyList.length && <li className="hint">아직 생성된 정리가 없습니다.</li>}
+                {weeklyList.map((f) => (
+                  <li key={f}>
+                    <button
+                      className={`weekly-item ${weeklyMd?.file === f ? "active" : ""}`}
+                      onClick={() => loadWeekly(f)}
+                    >📄 {f}</button>
+                  </li>
+                ))}
+              </ul>
+              {weeklyMd && <pre className="md-view">{weeklyMd.markdown}</pre>}
+              {!weeklyMd && weeklyList.length > 0 && (
+                <div className="hint" style={{ margin: "auto" }}>왼쪽에서 볼 정리를 선택하세요</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {milestone && (
         <div className="milestone-banner" onClick={() => setMilestone(null)}>
           🏅 <b>{milestone}일 연속</b> 스트릭 달성! 자소서 소재가 쌓이고 있어요 (클릭해서 닫기)
@@ -443,11 +536,14 @@ export default function Home() {
         <section className="summary-card">
           <div className="card-head">
             <h2>📝 주간 정리 생성</h2>
-            <span className="period-chip">
+            <div className="head-actions">
+              <button className="btn secondary small" onClick={openWeekly}>📚 지난 정리</button>
+              <span className="period-chip">
               {status.period
                 ? `${status.period.start.slice(5)} ~ ${status.period.end.slice(5)}`
                 : "Fetch 실행 후 기간 표시"}
             </span>
+            </div>
           </div>
           <p className="card-desc">
             <b>보충 메모</b>는 "오늘 뭘 왜 고치려 했는지 + 어떤 기술을 어떻게 적용했는지"를 적는 곳입니다.
@@ -472,12 +568,30 @@ export default function Home() {
                     minute: "2-digit",
                   })}
                 </span>
-                <span className="log-text">{n.text}</span>
-                <button
-                  className="memo-delete"
-                  onClick={() => deleteNote(n.at)}
-                  aria-label="메모 삭제"
-                >✕</button>
+                {editingAt === n.at ? (
+                  <span className="memo-edit">
+                    <textarea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      rows={2}
+                      autoFocus
+                    />
+                    <span className="memo-edit-actions">
+                      <button className="btn secondary small" onClick={() => setEditingAt(null)}>취소</button>
+                      <button className="btn small" onClick={saveEdit}>저장</button>
+                    </span>
+                  </span>
+                ) : (
+                  <>
+                    <span className="log-text">{n.text}</span>
+                    <button className="memo-delete" onClick={() => startEdit(n)} aria-label="메모 수정">✏️</button>
+                    <button
+                      className="memo-delete"
+                      onClick={() => deleteNote(n.at)}
+                      aria-label="메모 삭제"
+                    >✕</button>
+                  </>
+                )}
               </li>
             ))}
           </ul>

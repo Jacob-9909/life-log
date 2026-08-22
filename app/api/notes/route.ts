@@ -44,6 +44,26 @@ export async function POST(req) {
   }
 }
 
+// 메모 수정: { at, text }
+export async function PATCH(req) {
+  if (!check(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const body = await req.json().catch(() => ({}));
+  const at = body.at;
+  const text = (body.text || "").trim();
+  if (!at || !text) return NextResponse.json({ error: "missing at or text" }, { status: 400 });
+  try {
+    const file = await getContent("data/notes/all.json");
+    const data = file?.content ?? { notes: [] };
+    const target = data.notes.find((n) => n.at === at);
+    if (!target) return NextResponse.json({ error: "not found" }, { status: 404 });
+    target.text = text;
+    await putContent("data/notes/all.json", data, `chore(notes): 메모 수정 (${at})`);
+    return NextResponse.json(data);
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 });
+  }
+}
+
 export async function DELETE(req) {
   if (!check(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const at = new URL(req.url).searchParams.get("at");
