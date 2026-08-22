@@ -210,7 +210,7 @@
     },
     {
       "name": "wiki",
-      "state": "pending",
+      "state": "running",
       "commits": []
     }
   ]
