@@ -171,8 +171,10 @@
     },
     {
       "name": "nasdaq_checker",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "af5e4d9|08-22 13:22|feat: 일일 리포트에 상단 요약 테이블 추가 및 중립 종목 한 줄 축소"
+      ]
     },
     {
       "name": "package",
