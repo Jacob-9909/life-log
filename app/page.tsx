@@ -195,7 +195,15 @@ export default function Home() {
           />
         </div>
         <ul className="repo-list">
-          {(status.repos.length ? status.repos : []).map((r) => (
+          {(status.repos.length ? status.repos : [])
+            .slice()
+            .sort((a, b) => {
+              // 커밋 잡힌 repo(초록 ✓)를 맨 위로
+              const score = (r) =>
+                r.state === "done" && r.commits?.length > 0 ? 0 : r.state === "running" ? 1 : 2;
+              return score(a) - score(b) || a.name.localeCompare(b.name);
+            })
+            .map((r) => (
             <li key={r.name} className="repo-item" title={r.error || ""}>
               <span className={`check ${r.state} ${r.commits?.length ? "" : "empty"}`}>
                 {r.state === "done" ? "✓" : ""}
@@ -349,7 +357,6 @@ export default function Home() {
             .map(([t, n]) => `${t} ${n}`)
             .join(" · ");
           const expanded = expandedRepo === r.name;
-          const preview = expanded ? subjects : subjects.slice(0, 5);
           return (
             <div key={r.name} className="commit-group">
               <button
@@ -359,24 +366,13 @@ export default function Home() {
                 <span className="repo-summary-name">
                   {expanded ? "▾" : "▸"} {r.name}
                 </span>
-                <span className="repo-summary-count">{r.commits.length}건</span>
+                <span className="repo-summary-count">
+                  {r.commits.length}건 · {summary}
+                </span>
               </button>
-              <div className="type-chips">{summary}</div>
-              {!expanded && (
-                <ul>
-                  {preview.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                  {subjects.length > 5 && (
-                    <li className="more-link" onClick={() => setExpandedRepo(r.name)}>
-                      … 전체 {subjects.length}건 보기
-                    </li>
-                  )}
-                </ul>
-              )}
               {expanded && (
                 <ul>
-                  {preview.map((s, i) => (
+                  {subjects.map((s, i) => (
                     <li key={i}>{s}</li>
                   ))}
                   <li className="more-link" onClick={() => setExpandedRepo(null)}>
