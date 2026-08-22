@@ -400,7 +400,7 @@ export default function Home() {
                 c ? (
                   <span
                     key={i}
-                    className={`cal-day done cal-l${Math.min(4, Math.max(1, notesByDay[c.iso] || 1))} ${c.iso === todayIso ? "today" : ""}`}
+                    className={`cal-day ${calendar[c.iso] ? `done cal-l${Math.min(4, Math.max(1, notesByDay[c.iso] || 1))}` : ""} ${c.iso === todayIso ? "today" : ""}`}
                   title={`${c.iso}${calendar[c.iso] ? ` · 메모 ${notesByDay[c.iso] || 1}건` : ""}`}
                   >
                     {c.day}
