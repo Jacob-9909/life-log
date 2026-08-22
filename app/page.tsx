@@ -64,6 +64,7 @@ export default function Home() {
   const [expandedRepo, setExpandedRepo] = useState(null);
   const [milestone, setMilestone] = useState(null);
   const [levelUp, setLevelUp] = useState(null);
+  const [meta, setMeta] = useState({ lastGeneratedAt: null });
   const wasRunningRef = useRef(false);
   const cal = calendarGrid();
   const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
@@ -123,6 +124,10 @@ export default function Home() {
     loadStatus();
     loadNotes(code);
     loadCalendar();
+    fetch("/api/meta")
+      .then((r) => r.json())
+      .then(setMeta)
+      .catch(() => {});
     const t = setInterval(loadStatus, 3000);
     return () => clearInterval(t);
   }, [code, loadStatus, loadNotes, loadCalendar]);
@@ -134,7 +139,6 @@ export default function Home() {
   // Fetch 전체 완료 시 던전 클리어 컨페티
   useEffect(() => {
     if (wasRunningRef.current && !status.running && status.repos.length > 0) {
-      localStorage.setItem("ach-dungeon", "1");
       setTimeout(fireConfetti, 300);
     }
     wasRunningRef.current = !!status.running;
@@ -184,7 +188,7 @@ export default function Home() {
         body: JSON.stringify({ action }),
       });
       if (res.ok && action === "generate-weekly") {
-        localStorage.setItem("ach-first-summary", "1");
+        fetch("/api/meta").then((r) => r.json()).then(setMeta).catch(() => {});
       }
       if (res.ok && action === "fetch") setTimeout(loadStatus, 1500);
     } finally {
@@ -271,15 +275,16 @@ export default function Home() {
   const tier = [...TIERS].reverse().find(([lv]) => level >= Number(lv))[1];
   const nextTier = [...TIERS].find(([lv]) => level < Number(lv)) || null;
 
-  // 업적 정의 (전부 클라이언트 계산)
+  // 업적 정의 (전부 클라이언트 계산, 서버 데이터 기반 — 기기 무관)
   const commitTotal = status.repos.reduce((s, r) => s + (r.commits?.length || 0), 0);
+  const hasFullScan = !!status.finishedAt && status.repos.length > 0;
   const achievements = [
     { icon: "👣", name: "첫걸음", desc: "첫 업무 기록", ok: doneDays >= 1 },
     { icon: "🔥", name: "일주일 개근", desc: "7일 연속 기록", ok: streak >= 7 },
     { icon: "🌋", name: "한 달 개근", desc: "30일 연속 기록", ok: streak >= 30 },
     { icon: "💯", name: "백전백승", desc: "누적 100일", ok: doneDays >= 100 },
-    { icon: "🏆", name: "던전 클리어", desc: "Fetch 전체 완료", ok: typeof window !== "undefined" && !!localStorage.getItem("ach-dungeon") },
-    { icon: "📜", name: "첫 주간 정리", desc: "정리 생성 1회", ok: typeof window !== "undefined" && !!localStorage.getItem("ach-first-summary") },
+    { icon: "🏆", name: "던전 클리어", desc: "Fetch 전체 완료", ok: hasFullScan },
+    { icon: "📜", name: "첫 주간 정리", desc: "정리 생성 1회", ok: !!meta.lastGeneratedAt },
     { icon: "⚔️", name: "커밋 헌터", desc: "기간 내 커밋 50+", ok: commitTotal >= 50 },
     { icon: "🌙", name: "야행성", desc: "이번 달 기록 15+", ok: monthDone >= 15 },
   ];
@@ -372,7 +377,7 @@ export default function Home() {
               <span
                 key={a.name}
                 className={`ach-tile ${a.ok ? "unlocked" : ""}`}
-                title={`${a.name} — ${a.desc}${a.ok ? "" : " (잠금)"}`}
+                title={a.ok ? `${a.name} — ${a.desc}` : "잠금 중 — ???"}
               >
                 {a.ok ? a.icon : "🔒"}
               </span>
