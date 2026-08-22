@@ -198,8 +198,10 @@
     },
     {
       "name": "t2sql-package",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "64d2efd|08-21 09:49|Merge pull request #30 from jasmine-kje/feature/modify"
+      ]
     },
     {
       "name": "tablefold",
