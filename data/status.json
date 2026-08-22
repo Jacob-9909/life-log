@@ -155,8 +155,19 @@
     },
     {
       "name": "t2sql-package",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "64d2efd|08-21 09:49|Merge pull request #30 from jasmine-kje/feature/modify",
+        "dfe5482|08-20 13:20|refactor: rewrite_question prompt rewrite",
+        "6c5ef09|08-20 09:49|refactor: route follow-up questions to modify_sql",
+        "ae023fc|08-20 09:37|feat: update analyze servic",
+        "d312456|08-20 09:25|refactor: update analyze service modify_sql routing",
+        "2553594|08-19 14:17|Merge pull request #28 from jasmine-kje/feature/verify",
+        "87e7f8b|08-19 13:54|refactor: verify_before_response sql pass to final result",
+        "e5fb5f3|08-18 10:06|refactor: prompt f string",
+        "f117ce6|08-18 09:24|Merge pull request #27 from jasmine-kje/feature/verify",
+        "08e3467|08-18 09:21|refactor: standardize response parsing and evaluation logic for SQL agent outputs"
+      ]
     },
     {
       "name": "tablefold",
