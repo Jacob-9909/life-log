@@ -131,7 +131,7 @@
     },
     {
       "name": "package",
-      "state": "pending",
+      "state": "running",
       "commits": []
     },
     {
