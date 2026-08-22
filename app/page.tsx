@@ -122,6 +122,20 @@ export default function Home() {
   const cal = calendarGrid();
   const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   const doneDays = Object.keys(calendar).filter((k) => calendar[k]).length;
+  const monthDone = cal.cells.filter((c) => c && calendar[c.iso]).length;
+
+  // 오늘부터 거꾸로 연속 기록일 수 (스트릭)
+  const streak = (() => {
+    let n = 0;
+    const d = new Date(Date.now() + 9 * 3600 * 1000);
+    for (;;) {
+      const iso = d.toISOString().slice(0, 10);
+      if (!calendar[iso]) break;
+      n++;
+      d.setUTCDate(d.getUTCDate() - 1);
+    }
+    return n;
+  })();
 
   // 게이트: 접근 코드
   if (!code) {
@@ -177,63 +191,81 @@ export default function Home() {
             <li className="hint">아직 스캔 기록이 없습니다. Fetch 실행을 눌러주세요.</li>
           )}
         </ul>
-
-        <div className="calendar-box">
-          <div className="calendar-head">
-            <button
-              className="cal-nav"
-              onClick={() => setMonthOffset(monthOffset - 1)}
-              aria-label="이전 달"
-            >‹</button>
-            <span className="cal-label">{cal.label}</span>
-            <button
-              className="cal-nav"
-              onClick={() => setMonthOffset(Math.min(0, monthOffset + 1))}
-              disabled={monthOffset >= 0}
-              aria-label="다음 달"
-            >›</button>
-          </div>
-          <div className="cal-grid cal-dow">
-            {["월", "화", "수", "목", "금", "토", "일"].map((d) => (
-              <span key={d}>{d}</span>
-            ))}
-          </div>
-          <div className="cal-grid">
-            {cal.cells.map((c, i) =>
-              c ? (
-                <span
-                  key={i}
-                  className={`cal-day ${calendar[c.iso] ? "done" : ""} ${c.iso === todayIso ? "today" : ""}`}
-                  title={calendar[c.iso] ? "업무 정리 완료 ✓" : "기록 없음"}
-                >
-                  {c.day}
-                </span>
-              ) : (
-                <span key={i} />
-              )
-            )}
-          </div>
-          <div className="cal-summary">
-            이번 달 <b>{cal.cells.filter((c) => c && calendar[c.iso]).length}</b>일 기록 · 전체{" "}
-            <b>{doneDays}</b>일 🔥
-          </div>
-        </div>
       </aside>
 
       <main className="main">
+        <section className="calendar-section">
+          <div className="calendar-box">
+            <div className="calendar-head">
+              <button
+                className="cal-nav"
+                onClick={() => setMonthOffset(monthOffset - 1)}
+                aria-label="이전 달"
+              >‹</button>
+              <span className="cal-label">{cal.label} 업무 기록</span>
+              <button
+                className="cal-nav"
+                onClick={() => setMonthOffset(Math.min(0, monthOffset + 1))}
+                disabled={monthOffset >= 0}
+                aria-label="다음 달"
+              >›</button>
+            </div>
+            <div className="cal-grid cal-dow">
+              {["월", "화", "수", "목", "금", "토", "일"].map((d) => (
+                <span key={d}>{d}</span>
+              ))}
+            </div>
+            <div className="cal-grid">
+              {cal.cells.map((c, i) =>
+                c ? (
+                  <span
+                    key={i}
+                    className={`cal-day ${calendar[c.iso] ? "done" : ""} ${c.iso === todayIso ? "today" : ""}`}
+                    title={calendar[c.iso] ? "업무 정리 완료 ✓" : "기록 없음"}
+                  >
+                    {c.day}
+                  </span>
+                ) : (
+                  <span key={i} />
+                )
+              )}
+            </div>
+          </div>
+          <div className="cal-stats">
+            <div className="stat-item">
+              <div className="stat-num">{monthDone}</div>
+              <div className="stat-label">이번 달 기록</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-num">{streak}</div>
+              <div className="stat-label">연속 스트릭 🔥</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-num">{doneDays}</div>
+              <div className="stat-label">전체 누적</div>
+            </div>
+          </div>
+        </section>
+
         <h2>이번 주에 한 일</h2>
-        <div className="chat-scroll">
+        <div className="log-scroll">
           {!notes.length && (
             <div className="hint" style={{ margin: "auto" }}>
-              이번 주에 한 업무를 채팅처럼 적어보세요. 커밋 내역과 함께 주간 정리 .md로 저장됩니다.
+              이번 주에 한 업무를 아래에 적어보세요. 커밋 내역과 함께 주간 정리 .md로 저장됩니다.
             </div>
           )}
           {notes.map((n, i) => (
-            <div key={i} className="bubble mine">
-              {n.text}
-              <span className="time">
-                {new Date(n.at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
+            <div key={i} className="log-row">
+              <span className="log-time">
+                {new Date(n.at).toLocaleString("ko-KR", {
+                  timeZone: "Asia/Seoul",
+                  month: "numeric",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
+              <span className="log-text">{n.text}</span>
             </div>
           ))}
           <div ref={chatEndRef} />
@@ -249,7 +281,8 @@ export default function Home() {
                   sendNote();
                 }
               }}
-              placeholder="오늘/이번 주에 한 일을 입력... (Enter 전송, Shift+Enter 줄바꿈)"
+              placeholder="오늘 한 일 입력... (Enter 전송)"
+              rows={2}
             />
             <button className="btn" onClick={sendNote}>전송</button>
           </div>
