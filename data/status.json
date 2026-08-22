@@ -141,8 +141,9 @@
     },
     {
       "name": "t2s_agent",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [],
+      "error": "Command failed: git -C /Users/jacob/Develop/t2s_agent fetch --all --quiet\nfatal: could not read Password for 'https://***REMOVED***@github.com': Device not configured\n"
     },
     {
       "name": "t2sql-core-sunil",
