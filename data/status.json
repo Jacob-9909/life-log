@@ -34,8 +34,24 @@
     },
     {
       "name": "life-log",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "423f031|08-22 12:55|chore(status): 2026-W34 life-log 스캔 중",
+        "6b06719|08-22 12:54|chore(status): 2026-W34 Langgraph_Asset 완료 (+0)",
+        "894ccce|08-22 12:54|chore(status): 2026-W34 Langgraph_Asset 스캔 중",
+        "c507d65|08-22 12:54|chore(status): 2026-W34 Jacob-9909 완료 (+1)",
+        "124d997|08-22 12:54|chore(status): 2026-W34 Jacob-9909 스캔 중",
+        "a2048c8|08-22 12:54|chore(status): 2026-W34 DAG 완료 (+0)",
+        "9d4fd30|08-22 12:54|chore(status): 2026-W34 DAG 스캔 중",
+        "398c06d|08-22 12:54|chore(status): 2026-W34 CoinTrading 완료 (+0)",
+        "5a70f1b|08-22 12:54|chore(status): 2026-W34 CoinTrading 스캔 중",
+        "33c2c61|08-22 12:54|chore(status): 2026-W34 BookChecker 완료 (+0)",
+        "49fc773|08-22 12:54|chore(status): 2026-W34 BookChecker 스캔 중",
+        "7849603|08-22 12:54|chore(status): 2026-W34 스캔 시작",
+        "a22f888|08-22 12:54|chore(command): fetch 2026-W34",
+        "8aa482d|08-22 12:52|chore(calendar): 기존 업무일지 5일 시드",
+        "2bae7da|08-22 12:52|feat: life-log 대시보드 초기 버전"
+      ]
     },
     {
       "name": "mallangi",
