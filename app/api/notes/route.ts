@@ -43,3 +43,18 @@ export async function POST(req) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
 }
+
+export async function DELETE(req) {
+  if (!check(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const at = new URL(req.url).searchParams.get("at");
+  if (!at) return NextResponse.json({ error: "missing at" }, { status: 400 });
+  try {
+    const file = await getContent("data/notes/all.json");
+    const data = file?.content ?? { notes: [] };
+    data.notes = data.notes.filter((n) => n.at !== at);
+    await putContent("data/notes/all.json", data, `chore(notes): 메모 삭제 (${at})`);
+    return NextResponse.json(data);
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 });
+  }
+}

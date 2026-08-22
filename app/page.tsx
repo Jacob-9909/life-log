@@ -109,6 +109,17 @@ export default function Home() {
     }
   }
 
+  async function deleteNote(at) {
+    const res = await fetch(`/api/notes?at=${encodeURIComponent(at)}`, {
+      method: "DELETE",
+      headers: authHeaders(code),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setNotes(data.notes || []);
+    }
+  }
+
   // 달력 렌더링용: 현재 표시 중인 월의 날짜 그리드 (월요일 시작)
   function calendarGrid() {
     const now = new Date();
@@ -253,31 +264,48 @@ export default function Home() {
           </div>
         </section>
 
-        <h2>주간 정리 보충 메모</h2>
-        <div className="log-scroll">
-          {!notes.length && (
-            <div className="hint" style={{ margin: "auto" }}>
-              커밋으로 안 담기는 내용을 적어두면 주간 정리 생성 시 함께 반영됩니다. (미팅·학습·의사결정 등)
-            </div>
-          )}
-          {notes.map((n, i) => (
-            <div key={i} className="log-row">
-              <span className="log-time">
-                {new Date(n.at).toLocaleString("ko-KR", {
-                  timeZone: "Asia/Seoul",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
-              <span className="log-text">{n.text}</span>
-            </div>
-          ))}
-          <div ref={chatEndRef} />
-        </div>
-        <div className="chat-input-area">
-          <div className="chat-input-row">
+        <section className="summary-card">
+          <div className="card-head">
+            <h2>📝 주간 정리 생성</h2>
+            <span className="period-chip">
+              {status.period
+                ? `${status.period.start.slice(5)} ~ ${status.period.end.slice(5)}`
+                : "Fetch 실행 후 기간 표시"}
+            </span>
+          </div>
+          <p className="card-desc">
+            아래 보충 메모는 커밋 로그와 함께 NIM(LLM)이 주간 정리를 작성할 때 쓰입니다.
+            생성 결과는 <code>~/job/docs/10_주간정리/</code>에 .md로 저장돼요.
+          </p>
+
+          <ul className="memo-list">
+            {!notes.length && (
+              <li className="hint" style={{ listStyle: "none", marginLeft: -20 }}>
+                아직 보충 메모가 없습니다. 커밋으로 안 담기는 내용(미팅·학습·의사결정)을 추가해보세요.
+              </li>
+            )}
+            {notes.map((n, i) => (
+              <li key={i} className="memo-item">
+                <span className="log-time">
+                  {new Date(n.at).toLocaleString("ko-KR", {
+                    timeZone: "Asia/Seoul",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+                <span className="log-text">{n.text}</span>
+                <button
+                  className="memo-delete"
+                  onClick={() => deleteNote(n.at)}
+                  aria-label="메모 삭제"
+                >✕</button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="chat-input-row" style={{ marginTop: 12 }}>
             <textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
@@ -287,20 +315,21 @@ export default function Home() {
                   sendNote();
                 }
               }}
-              placeholder="보충할 내용 입력... (Enter 추가)"
+              placeholder="보충 내용 입력... (Enter 추가)"
               rows={2}
             />
-            <button className="btn" onClick={sendNote}>추가</button>
+            <button className="btn secondary" onClick={sendNote}>+ 메모 추가</button>
           </div>
+
           <button
             className="btn generate"
             disabled={busy}
             onClick={() => trigger("generate-weekly")}
-            title="마지막 정리 이후 커밋 + 보충 메모로 NIM이 주간 정리를 작성해 ~/job/docs/10_주간정리/ 에 저장합니다"
+            title="마지막 정리 이후 커밋 + 위 보충 메모로 NIM이 주간 정리를 작성합니다"
           >
-            📝 주간 정리 생성{status.period ? ` (${status.period.start.slice(5)} ~ ${status.period.end.slice(5)})` : ""} → job 폴더에 .md 저장
+            이 기간 내용으로 주간 정리 생성하기 →
           </button>
-        </div>
+        </section>
       </main>
 
       <aside className="commits-panel">
