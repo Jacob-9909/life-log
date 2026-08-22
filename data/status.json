@@ -1,185 +1,99 @@
 {
   "week": "2026-W34",
-  "requestedAt": "2026-08-22T03:54:31.753Z",
-  "startedAt": "2026-08-22T03:54:37.219Z",
-  "running": false,
-  "finishedAt": "2026-08-22T03:55:47.239Z",
+  "requestedAt": "2026-08-22T04:08:12.090Z",
+  "startedAt": "2026-08-22T04:08:10.604Z",
+  "running": true,
+  "finishedAt": null,
   "repos": [
     {
       "name": "BookChecker",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "CoinTrading",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "DAG",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "Jacob-9909",
-      "state": "done",
-      "commits": [
-        "445481a|08-20 13:49|chore: bust camo cache on top-langs card"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "Langgraph_Asset",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "life-log",
-      "state": "done",
-      "commits": [
-        "423f031|08-22 12:55|chore(status): 2026-W34 life-log 스캔 중",
-        "6b06719|08-22 12:54|chore(status): 2026-W34 Langgraph_Asset 완료 (+0)",
-        "894ccce|08-22 12:54|chore(status): 2026-W34 Langgraph_Asset 스캔 중",
-        "c507d65|08-22 12:54|chore(status): 2026-W34 Jacob-9909 완료 (+1)",
-        "124d997|08-22 12:54|chore(status): 2026-W34 Jacob-9909 스캔 중",
-        "a2048c8|08-22 12:54|chore(status): 2026-W34 DAG 완료 (+0)",
-        "9d4fd30|08-22 12:54|chore(status): 2026-W34 DAG 스캔 중",
-        "398c06d|08-22 12:54|chore(status): 2026-W34 CoinTrading 완료 (+0)",
-        "5a70f1b|08-22 12:54|chore(status): 2026-W34 CoinTrading 스캔 중",
-        "33c2c61|08-22 12:54|chore(status): 2026-W34 BookChecker 완료 (+0)",
-        "49fc773|08-22 12:54|chore(status): 2026-W34 BookChecker 스캔 중",
-        "7849603|08-22 12:54|chore(status): 2026-W34 스캔 시작",
-        "a22f888|08-22 12:54|chore(command): fetch 2026-W34",
-        "8aa482d|08-22 12:52|chore(calendar): 기존 업무일지 5일 시드",
-        "2bae7da|08-22 12:52|feat: life-log 대시보드 초기 버전"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "mallangi",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "midas-touch",
-      "state": "done",
-      "commits": [
-        "5a431aa|08-22 11:44|style(design): 챗 사이드바 보조 액션을 외곽선 버튼으로 낮춤",
-        "915a984|08-22 11:42|style(design): Revolut 디자인 시스템 적용 — 두 모드 캔버스로 전환",
-        "f317190|08-21 21:58|feat(onboarding): 첫 방문자에게 번호 매긴 스포트라이트 입력 가이드",
-        "f6f025c|08-21 21:41|feat(cheongyak): 1순위 자격을 공고별로 다시 판정",
-        "e168087|08-21 21:27|feat(profile): 페르소나 선택을 걷어내고 청약 심사 기준으로 직접 입력받게 전환",
-        "ae8d3a2|08-21 20:53|refactor(home): 랜딩에서 core 무관 섹션 전부 제거",
-        "4c9ed64|08-21 20:36|feat(deploy): 무중단 워치독(keepalive.sh) + 배포 런북",
-        "6a7e0eb|08-21 20:31|fix(deploy): 공개 URL에서 챗봇이 죽는 문제 3건 수정",
-        "d7c3886|08-21 00:08|fix(mvp): 랜딩 재포지셔닝 + 부양가족 인정요건 안내 + 죽은 설정 제거",
-        "7e4a3ae|08-20 23:24|docs(cheongyak,simulator): 가점·예치금 기준표에 법령 근거·확인일 명시",
-        "0ed24b6|08-20 23:18|fix(cheongyak): 청약가점 무주택기간에 '30세 미만·미혼=0점' 게이트 누락 수정",
-        "d124ef0|08-20 23:07|fix(cheongyak,simulator): 가점제 미적용 탭 안내 + 청약↔시뮬레이터 연결",
-        "7b05295|08-20 23:01|feat(mvp): 헤드라인 재배치 + 자금마련 시뮬레이터 + 청약가점 계산기",
-        "1e4c5c1|08-20 23:00|chore(mvp): 파인튜닝 파이프라인 제거, RAG 인입 경로는 유지",
-        "1f0dd50|08-20 14:16|Merge pull request #23 from Jacob-9909/docs/readme-architecture-svg",
-        "7b3a6c5|08-20 14:15|docs: update README.md and add Archify system architecture diagram SVG",
-        "7f72365|08-20 13:41|Merge pull request #22 from Jacob-9909/chore/remove-dead-frontend",
-        "79d7cd0|08-20 13:40|chore(frontend): remove unused bits components and dead export",
-        "909ba56|08-20 13:36|Merge pull request #21 from Jacob-9909/chore/gitignore-scripts",
-        "99a7f48|08-20 13:35|chore: ignore local scripts/ (ops helpers + daemon logs)",
-        "bddc4e1|08-20 13:32|Merge pull request #14 from Jacob-9909/feat/ops-container",
-        "3b8cced|08-20 13:30|Merge remote-tracking branch 'origin/main' into pr14",
-        "fc351fb|08-20 13:29|Merge pull request #11 from Jacob-9909/feat/chat-streaming-progress",
-        "75efe00|08-20 13:25|feat(chat): wire streamChat onStatus callback",
-        "bb3eb0e|08-20 13:24|Merge remote-tracking branch 'origin/main' into pr11-work",
-        "0176451|08-20 13:20|Merge pull request #12 from Jacob-9909/feat/market-freshness-ui",
-        "a22ed5d|08-20 13:20|Merge pull request #10 from Jacob-9909/refactor/agent-info-framing",
-        "9c5f734|08-20 13:20|Merge pull request #13 from Jacob-9909/feat/graph-summary-index",
-        "a61c2b9|08-20 13:20|Merge pull request #15 from Jacob-9909/feat/calibration-validation",
-        "0a0c40f|08-20 13:13|Merge pull request #20 from Jacob-9909/fix/lint-unused-imports",
-        "7de4791|08-20 13:12|fix: clear remaining lint warnings (unused disables, img-element, ref cleanup)",
-        "65bbd3f|08-20 13:08|fix: remove unused imports and dead MacroSparkline component",
-        "a449f21|08-20 12:28|Merge pull request #19 from Jacob-9909/fix/ci-lint-errors",
-        "943d8f2|08-20 12:27|fix(frontend): resolve explicit any error in TargetCursor",
-        "f85e553|08-20 12:26|fix(frontend): adjust eslint rules for reactbits animation components",
-        "4fd2358|08-20 12:25|Merge pull request #18 from Jacob-9909/fix/ci-lint-errors",
-        "c2dd0c0|08-20 12:23|fix(backend): resolve ruff lint errors and missing db_cursor import",
-        "cd13d18|08-20 12:14|Merge pull request #17 from Jacob-9909/feat/reactbits-landing-animations",
-        "744bef1|08-20 11:30|feat(ui): integrate reactbits animations into landing and global cursor",
-        "260f640|08-20 11:30|feat(ui): add landing section wrappers and hero gradient assets",
-        "9ea8ea4|08-20 11:30|feat(ui): add reactbits animation components",
-        "2b57ae5|08-20 11:30|chore(deps): add gsap for reactbits animations",
-        "d87fc3f|08-20 11:26|Merge pull request #16 from Jacob-9909/fix/backend-overall-improvements",
-        "8ef35d5|08-20 11:24|merge: resolve conflicts with origin/main",
-        "21e6800|08-20 11:21|fix(api): ensure db cursor closure in context manager and wrap chat errors in http exception",
-        "a563303|08-20 11:21|fix(service): cap in-memory job logs and add cache eviction for cheongyak client",
-        "b88223c|08-20 11:21|fix(trading): include transaction fees in trade metrics and cache ticker history during validation",
-        "a638da8|08-20 11:21|fix(concurrency): add thread locks to api key rotator and background cache updaters",
-        "61d07af|08-20 11:21|fix(agent): add exception handling in tool nodes and fallback ticker parsing in intent router",
-        "a2b6fc9|08-20 11:21|fix(security): sanitize sub_dir path in dataset preview and offload file io to thread"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "MiniWrenAI",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "morethan-log",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "nasdaq_checker",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "package",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "portfolio_web",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "t2s_agent",
-      "state": "done",
-      "commits": [],
-      "error": "Command failed: git -C /Users/jacob/Develop/t2s_agent fetch --all --quiet\nfatal: could not read Password for 'https://***REMOVED***@github.com': Device not configured\n"
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "t2sql-core-sunil",
-      "state": "done",
-      "commits": [
-        "168462e|08-18 09:24|Merge pull request #30 from jasmine-kje/feature/recent",
-        "5f70062|08-18 09:15|refactor: optimize question rewrite logic to improve accuracy and reduce latency"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "t2sql-package",
-      "state": "done",
-      "commits": [
-        "64d2efd|08-21 09:49|Merge pull request #30 from jasmine-kje/feature/modify",
-        "dfe5482|08-20 13:20|refactor: rewrite_question prompt rewrite",
-        "6c5ef09|08-20 09:49|refactor: route follow-up questions to modify_sql",
-        "ae023fc|08-20 09:37|feat: update analyze servic",
-        "d312456|08-20 09:25|refactor: update analyze service modify_sql routing",
-        "2553594|08-19 14:17|Merge pull request #28 from jasmine-kje/feature/verify",
-        "87e7f8b|08-19 13:54|refactor: verify_before_response sql pass to final result",
-        "e5fb5f3|08-18 10:06|refactor: prompt f string",
-        "f117ce6|08-18 09:24|Merge pull request #27 from jasmine-kje/feature/verify",
-        "08e3467|08-18 09:21|refactor: standardize response parsing and evaluation logic for SQL agent outputs"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "tablefold",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "wiki",
-      "state": "done",
-      "commits": [
-        "43c46df|08-17 16:46|Develop 로컬 프로젝트 17개 딥다이브 ingest"
-      ]
+      "state": "pending",
+      "commits": []
     }
   ]
 }
