@@ -1,0 +1,7 @@
+node_modules/
+.next/
+.env*.local
+daemon/logs/
+data/command.json
+data/status.json
+.DS_Store

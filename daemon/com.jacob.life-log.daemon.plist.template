@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.jacob.life-log.daemon</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__NODE__</string>
+    <string>__HOME__/Develop/life-log/daemon/daemon.mjs</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>GITHUB_REPO</key>
+    <string>__REPO__</string>
+    <key>GITHUB_TOKEN</key>
+    <string>__TOKEN__</string>
+    <key>GITHUB_BRANCH</key>
+    <string>main</string>
+    <key>POLL_MS</key>
+    <string>15000</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>__HOME__/Develop/life-log/daemon/logs/stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>__HOME__/Develop/life-log/daemon/logs/stderr.log</string>
+</dict>
+</plist>

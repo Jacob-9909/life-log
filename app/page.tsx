@@ -1,0 +1,285 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+
+function authHeaders(code) {
+  return { "Content-Type": "application/json", "x-access-code": code };
+}
+
+export default function Home() {
+  const [code, setCode] = useState("");
+  const [codeInput, setCodeInput] = useState("");
+  const [gateError, setGateError] = useState("");
+
+  const [repos, setRepos] = useState([]);
+  const [status, setStatus] = useState({ repos: [], finishedAt: null, running: false, week: "" });
+  const [notes, setNotes] = useState([]);
+  const [calendar, setCalendar] = useState({});
+  const [monthOffset, setMonthOffset] = useState(0);
+  const [draft, setDraft] = useState("");
+  const [busy, setBusy] = useState(false);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("life-log-code");
+    if (saved) setCode(saved);
+  }, []);
+
+  const loadStatus = useCallback(async () => {
+    const res = await fetch("/api/status");
+    const data = await res.json();
+    if (data.repos?.length) {
+      setStatus(data);
+      setRepos(data.repos.map((r) => r.name));
+    }
+  }, []);
+
+  const loadNotes = useCallback(async (c) => {
+    const res = await fetch("/api/notes", { headers: authHeaders(c) });
+    if (res.ok) {
+      const data = await res.json();
+      setNotes(data.notes || []);
+    }
+  }, []);
+
+  const loadCalendar = useCallback(async () => {
+    const res = await fetch("/api/calendar");
+    if (res.ok) setCalendar(await res.json());
+  }, []);
+
+  useEffect(() => {
+    if (!code) return;
+    loadStatus();
+    loadNotes(code);
+    loadCalendar();
+    const t = setInterval(loadStatus, 3000);
+    return () => clearInterval(t);
+  }, [code, loadStatus, loadNotes, loadCalendar]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [notes.length]);
+
+  async function handleGate(e) {
+    e.preventDefault();
+    const res = await fetch("/api/notes", { headers: authHeaders(codeInput) });
+    if (res.ok) {
+      localStorage.setItem("life-log-code", codeInput);
+      setCode(codeInput);
+      setGateError("");
+    } else {
+      setGateError("접근 코드가 올바르지 않습니다");
+    }
+  }
+
+  async function trigger(action) {
+    setBusy(true);
+    try {
+      await fetch("/api/trigger", {
+        method: "POST",
+        headers: authHeaders(code),
+        body: JSON.stringify({ action }),
+      });
+      if (action === "fetch") setTimeout(loadStatus, 1500);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function sendNote() {
+    const text = draft.trim();
+    if (!text) return;
+    setDraft("");
+    const res = await fetch("/api/notes", {
+      method: "POST",
+      headers: authHeaders(code),
+      body: JSON.stringify({ text }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setNotes(data.notes || []);
+      loadCalendar();
+    }
+  }
+
+  // 달력 렌더링용: 현재 표시 중인 월의 날짜 그리드 (월요일 시작)
+  function calendarGrid() {
+    const now = new Date();
+    const base = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
+    const year = base.getFullYear();
+    const month = base.getMonth();
+    const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // 월=0
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < firstDow; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) {
+      const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      cells.push({ day: d, iso });
+    }
+    return { cells, label: `${year}년 ${month + 1}월` };
+  }
+  const cal = calendarGrid();
+  const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const doneDays = Object.keys(calendar).filter((k) => calendar[k]).length;
+
+  // 게이트: 접근 코드
+  if (!code) {
+    return (
+      <form className="gate" onSubmit={handleGate}>
+        <h1 style={{ fontSize: 22 }}>Life Log</h1>
+        <p className="hint">이 대시보드는 비공개입니다. 접근 코드를 입력하세요.</p>
+        <input
+          type="password"
+          value={codeInput}
+          onChange={(e) => setCodeInput(e.target.value)}
+          placeholder="access code"
+          autoFocus
+        />
+        <button className="btn" type="submit">열기</button>
+        {gateError && <div className="error-msg">{gateError}</div>}
+      </form>
+    );
+  }
+
+  const doneCount = status.repos?.filter((r) => r.state === "done").length ?? 0;
+  const totalCount = status.repos?.length ?? 0;
+  const running = !!status.running;
+  const week = status.week || "";
+  const commitGroups =
+    status.repos?.filter((r) => r.state === "done" && r.commits?.length > 0) ?? [];
+
+  return (
+    <div className="app">
+      <aside className="sidebar">
+        <h1>Life Log</h1>
+        <div className="week-label">{week ? `${week} · 이번 주 작업 현황` : "이번 주 작업 현황"}</div>
+        <button className="btn" disabled={busy || running} onClick={() => trigger("fetch")}>
+          {running ? "스캔 중..." : "▶ Fetch 실행"}
+        </button>
+        <div className="progress-bar">
+          <div
+            className="progress-fill"
+            style={{ width: totalCount ? `${(doneCount / totalCount) * 100}%` : "0%" }}
+          />
+        </div>
+        <ul className="repo-list">
+          {(status.repos.length ? status.repos : []).map((r) => (
+            <li key={r.name} className="repo-item" title={r.error || ""}>
+              <span className={`check ${r.state} ${r.commits?.length ? "" : "empty"}`}>
+                {r.state === "done" ? "✓" : ""}
+              </span>
+              <span>{r.name}</span>
+              <span className="commit-count">{r.commits?.length ? `${r.commits.length}` : ""}</span>
+            </li>
+          ))}
+          {!status.repos.length && (
+            <li className="hint">아직 스캔 기록이 없습니다. Fetch 실행을 눌러주세요.</li>
+          )}
+        </ul>
+
+        <div className="calendar-box">
+          <div className="calendar-head">
+            <button
+              className="cal-nav"
+              onClick={() => setMonthOffset(monthOffset - 1)}
+              aria-label="이전 달"
+            >‹</button>
+            <span className="cal-label">{cal.label}</span>
+            <button
+              className="cal-nav"
+              onClick={() => setMonthOffset(Math.min(0, monthOffset + 1))}
+              disabled={monthOffset >= 0}
+              aria-label="다음 달"
+            >›</button>
+          </div>
+          <div className="cal-grid cal-dow">
+            {["월", "화", "수", "목", "금", "토", "일"].map((d) => (
+              <span key={d}>{d}</span>
+            ))}
+          </div>
+          <div className="cal-grid">
+            {cal.cells.map((c, i) =>
+              c ? (
+                <span
+                  key={i}
+                  className={`cal-day ${calendar[c.iso] ? "done" : ""} ${c.iso === todayIso ? "today" : ""}`}
+                  title={calendar[c.iso] ? "업무 정리 완료 ✓" : "기록 없음"}
+                >
+                  {c.day}
+                </span>
+              ) : (
+                <span key={i} />
+              )
+            )}
+          </div>
+          <div className="cal-summary">
+            이번 달 <b>{cal.cells.filter((c) => c && calendar[c.iso]).length}</b>일 기록 · 전체{" "}
+            <b>{doneDays}</b>일 🔥
+          </div>
+        </div>
+      </aside>
+
+      <main className="main">
+        <h2>이번 주에 한 일</h2>
+        <div className="chat-scroll">
+          {!notes.length && (
+            <div className="hint" style={{ margin: "auto" }}>
+              이번 주에 한 업무를 채팅처럼 적어보세요. 커밋 내역과 함께 주간 정리 .md로 저장됩니다.
+            </div>
+          )}
+          {notes.map((n, i) => (
+            <div key={i} className="bubble mine">
+              {n.text}
+              <span className="time">
+                {new Date(n.at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
+              </span>
+            </div>
+          ))}
+          <div ref={chatEndRef} />
+        </div>
+        <div className="chat-input-area">
+          <div className="chat-input-row">
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendNote();
+                }
+              }}
+              placeholder="오늘/이번 주에 한 일을 입력... (Enter 전송, Shift+Enter 줄바꿈)"
+            />
+            <button className="btn" onClick={sendNote}>전송</button>
+          </div>
+          <button
+            className="btn generate"
+            disabled={busy}
+            onClick={() => trigger("generate-weekly")}
+            title="로컬 맥의 데몬이 ~/job/docs/10_주간정리/ 에 md 파일을 생성합니다"
+          >
+            📝 주간 정리 생성 ({week}) → job 폴더에 .md 저장
+          </button>
+        </div>
+      </main>
+
+      <aside className="commits-panel">
+        <h2>Git 커밋 요약</h2>
+        {!commitGroups.length && <div className="hint">Fetch 실행 후 커밋 내역이 표시됩니다.</div>}
+        {commitGroups.map((r) => (
+          <div key={r.name} className="commit-group">
+            <h3>
+              {r.name} — {r.commits.length}건
+            </h3>
+            <ul>
+              {r.commits.slice(0, 30).map((c, i) => (
+                <li key={i}>{c}</li>
+              ))}
+              {r.commits.length > 30 && <li>… 외 {r.commits.length - 30}건</li>}
+            </ul>
+          </div>
+        ))}
+      </aside>
+    </div>
+  );
+}
