@@ -28,7 +28,7 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 24px rgba(139, 92, 246, 0.35);
+  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.45));
 }
 .level-chip {
   font-family: var(--font-pixel), monospace;
