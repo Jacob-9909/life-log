@@ -146,8 +146,18 @@
     },
     {
       "name": "midas-touch",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "5a431aa|08-22 11:44|style(design): 챗 사이드바 보조 액션을 외곽선 버튼으로 낮춤",
+        "915a984|08-22 11:42|style(design): Revolut 디자인 시스템 적용 — 두 모드 캔버스로 전환",
+        "f317190|08-21 21:58|feat(onboarding): 첫 방문자에게 번호 매긴 스포트라이트 입력 가이드",
+        "f6f025c|08-21 21:41|feat(cheongyak): 1순위 자격을 공고별로 다시 판정",
+        "e168087|08-21 21:27|feat(profile): 페르소나 선택을 걷어내고 청약 심사 기준으로 직접 입력받게 전환",
+        "ae8d3a2|08-21 20:53|refactor(home): 랜딩에서 core 무관 섹션 전부 제거",
+        "4c9ed64|08-21 20:36|feat(deploy): 무중단 워치독(keepalive.sh) + 배포 런북",
+        "6a7e0eb|08-21 20:31|fix(deploy): 공개 URL에서 챗봇이 죽는 문제 3건 수정",
+        "d7c3886|08-21 00:08|fix(mvp): 랜딩 재포지셔닝 + 부양가족 인정요건 안내 + 죽은 설정 제거"
+      ]
     },
     {
       "name": "MiniWrenAI",
