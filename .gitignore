@@ -5,3 +5,4 @@ daemon/logs/
 data/command.json
 data/status.json
 .DS_Store
+.vercel

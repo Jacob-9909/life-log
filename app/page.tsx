@@ -16,6 +16,7 @@ export default function Home() {
   const [notes, setNotes] = useState([]);
   const [calendar, setCalendar] = useState({});
   const [monthOffset, setMonthOffset] = useState(0);
+  const [expandedRepo, setExpandedRepo] = useState(null);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const chatEndRef = useRef(null);
@@ -266,19 +267,58 @@ export default function Home() {
       <aside className="commits-panel">
         <h2>Git 커밋 요약</h2>
         {!commitGroups.length && <div className="hint">Fetch 실행 후 커밋 내역이 표시됩니다.</div>}
-        {commitGroups.map((r) => (
-          <div key={r.name} className="commit-group">
-            <h3>
-              {r.name} — {r.commits.length}건
-            </h3>
-            <ul>
-              {r.commits.slice(0, 30).map((c, i) => (
-                <li key={i}>{c}</li>
-              ))}
-              {r.commits.length > 30 && <li>… 외 {r.commits.length - 30}건</li>}
-            </ul>
-          </div>
-        ))}
+        {commitGroups.map((r) => {
+          const subjects = r.commits.map((c) => c.split("|").pop());
+          // conventional commit 접두어별 집계
+          const types = {};
+          for (const s of subjects) {
+            const m = s.match(/^(feat|fix|refactor|chore|docs|test|merge|style|perf|ci)\b/i);
+            const t = m ? m[1].toLowerCase() : "etc";
+            types[t] = (types[t] || 0) + 1;
+          }
+          const summary = Object.entries(types)
+            .sort((a, b) => (b[1] as number) - (a[1] as number))
+            .map(([t, n]) => `${t} ${n}`)
+            .join(" · ");
+          const expanded = expandedRepo === r.name;
+          const preview = expanded ? subjects : subjects.slice(0, 5);
+          return (
+            <div key={r.name} className="commit-group">
+              <button
+                className="repo-summary-btn"
+                onClick={() => setExpandedRepo(expanded ? null : r.name)}
+              >
+                <span className="repo-summary-name">
+                  {expanded ? "▾" : "▸"} {r.name}
+                </span>
+                <span className="repo-summary-count">{r.commits.length}건</span>
+              </button>
+              <div className="type-chips">{summary}</div>
+              {!expanded && (
+                <ul>
+                  {preview.map((s, i) => (
+                    <li key={i}>{s}</li>
+                  ))}
+                  {subjects.length > 5 && (
+                    <li className="more-link" onClick={() => setExpandedRepo(r.name)}>
+                      … 전체 {subjects.length}건 보기
+                    </li>
+                  )}
+                </ul>
+              )}
+              {expanded && (
+                <ul>
+                  {preview.map((s, i) => (
+                    <li key={i}>{s}</li>
+                  ))}
+                  <li className="more-link" onClick={() => setExpandedRepo(null)}>
+                    접기
+                  </li>
+                </ul>
+              )}
+            </div>
+          );
+        })}
       </aside>
     </div>
   );
