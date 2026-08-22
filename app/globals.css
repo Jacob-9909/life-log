@@ -31,15 +31,21 @@ body {
   text-shadow: 0 0 24px rgba(139, 92, 246, 0.35);
 }
 .level-chip {
-  font-size: 12px;
-  font-weight: 800;
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  padding: 5px 10px;
   color: #ffd166;
   background: rgba(255, 209, 102, 0.1);
   border: 1px solid rgba(255, 209, 102, 0.45);
   border-radius: 999px;
-  padding: 3px 10px;
   box-shadow: 0 0 14px rgba(255, 209, 102, 0.25);
   text-shadow: 0 0 8px rgba(255, 209, 102, 0.5);
+}
+.tier-label {
+  font-size: 11.5px;
+  color: #a78bfa;
+  margin-top: 6px;
+  letter-spacing: 0.04em;
 }
 .xp-bar {
   height: 7px;
@@ -177,6 +183,16 @@ body {
   text-shadow: 0 0 8px rgba(110, 231, 183, 0.7);
   box-shadow: inset 0 0 8px rgba(16, 185, 129, 0.25);
 }
+/* 히트맵 농도 4단계 (메모 개수 기반) */
+.cal-day.cal-l1 { background: rgba(16, 185, 129, 0.18); }
+.cal-day.cal-l2 { background: rgba(16, 185, 129, 0.4); }
+.cal-day.cal-l3 { background: rgba(16, 185, 129, 0.65); color: #d1fae5; }
+.cal-day.cal-l4 {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  color: #06281e;
+  text-shadow: none;
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.8);
+}
 .cal-day.done::after {
   content: "✓";
   position: absolute;
@@ -189,9 +205,10 @@ body {
 .cal-stats { display: flex; gap: 36px; margin-left: auto; padding-right: 12px; }
 .stat-item { text-align: center; }
 .stat-num {
-  font-size: 32px;
-  font-weight: 900;
-  line-height: 1.2;
+  font-family: var(--font-pixel), monospace;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.4;
   color: #ffd166;
   text-shadow: 0 0 16px rgba(255, 209, 102, 0.55);
   font-variant-numeric: tabular-nums;
@@ -398,6 +415,100 @@ body {
 .milestone-banner b { color: #ffd166; text-shadow: 0 0 10px rgba(255, 209, 102, 0.6); }
 @keyframes banner-drop {
   from { transform: translateX(-50%) translateY(-80px); opacity: 0; }
+}
+
+/* ===== 업적 그리드 ===== */
+.ach-box {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(124, 58, 237, 0.25);
+}
+.ach-head {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffd166;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.ach-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  font-size: 17px;
+  background: #14121f;
+  border: 1px solid #262338;
+  filter: grayscale(1);
+  opacity: 0.4;
+  cursor: help;
+  transition: all 0.2s ease;
+}
+.ach-tile.unlocked {
+  filter: none;
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.12), rgba(167, 139, 250, 0.12));
+  border-color: rgba(255, 209, 102, 0.45);
+  box-shadow: 0 0 12px rgba(255, 209, 102, 0.2);
+}
+.ach-tile.unlocked:hover { transform: scale(1.1); }
+
+/* ===== 레벨업 모달 ===== */
+.levelup-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 5, 12, 0.7);
+  backdrop-filter: blur(4px);
+}
+.levelup-box {
+  text-align: center;
+  padding: 40px 60px;
+  background: linear-gradient(160deg, rgba(30, 20, 60, 0.9), rgba(10, 12, 24, 0.95));
+  border: 2px solid rgba(255, 209, 102, 0.6);
+  border-radius: 20px;
+  box-shadow: 0 0 60px rgba(255, 209, 102, 0.35), 0 0 120px rgba(124, 58, 237, 0.3);
+  animation: levelup-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.levelup-text {
+  font-family: var(--font-pixel), monospace;
+  font-size: 28px;
+  color: #ffd166;
+  text-shadow: 0 0 24px rgba(255, 209, 102, 0.8), 3px 3px 0 rgba(124, 58, 237, 0.8);
+  margin-bottom: 16px;
+  animation: shine 2s linear infinite;
+  background: linear-gradient(100deg, #ffd166 30%, #fff7d6 50%, #ffd166 70%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.levelup-tier { font-size: 18px; font-weight: 800; color: #c4b5fd; }
+@keyframes levelup-pop {
+  from { transform: scale(0.5); opacity: 0; }
+}
+
+/* ===== CRT 스캔라인 ===== */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(0, 0, 0, 0.13) 2px,
+    rgba(0, 0, 0, 0.13) 4px
+  );
 }
 
 /* 게이트 */

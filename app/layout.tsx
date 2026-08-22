@@ -1,4 +1,11 @@
 import "./globals.css";
+import { Press_Start_2P } from "next/font/google";
+
+const pixel = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-pixel",
+});
 
 export const metadata = {
   title: "Life Log",
@@ -8,7 +15,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body className={pixel.variable}>{children}</body>
     </html>
   );
 }

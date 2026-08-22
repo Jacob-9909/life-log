@@ -63,6 +63,7 @@ export default function Home() {
   const [monthOffset, setMonthOffset] = useState(0);
   const [expandedRepo, setExpandedRepo] = useState(null);
   const [milestone, setMilestone] = useState(null);
+  const [levelUp, setLevelUp] = useState(null);
   const wasRunningRef = useRef(false);
   const cal = calendarGrid();
   const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
@@ -133,6 +134,7 @@ export default function Home() {
   // Fetch 전체 완료 시 던전 클리어 컨페티
   useEffect(() => {
     if (wasRunningRef.current && !status.running && status.repos.length > 0) {
+      localStorage.setItem("ach-dungeon", "1");
       setTimeout(fireConfetti, 300);
     }
     wasRunningRef.current = !!status.running;
@@ -165,12 +167,15 @@ export default function Home() {
   async function trigger(action) {
     setBusy(true);
     try {
-      await fetch("/api/trigger", {
+      const res = await fetch("/api/trigger", {
         method: "POST",
         headers: authHeaders(code),
         body: JSON.stringify({ action }),
       });
-      if (action === "fetch") setTimeout(loadStatus, 1500);
+      if (res.ok && action === "generate-weekly") {
+        localStorage.setItem("ach-first-summary", "1");
+      }
+      if (res.ok && action === "fetch") setTimeout(loadStatus, 1500);
     } finally {
       setBusy(false);
     }
@@ -248,11 +253,61 @@ export default function Home() {
   // 저녁 6시 이후 오늘 기록 없으면 스트릭 위험 경보
   const streakDanger = !calendar[todayIso] && new Date(Date.now() + 9 * 3600 * 1000).getUTCHours() >= 18;
 
+  // 칭호 시스템
+  const TIERS = [
+    [1, "잡몹 사냥꾼"], [5, "모험가"], [10, "기사단원"], [15, "대마법사"], [20, "전설"],
+  ];
+  const tier = [...TIERS].reverse().find(([lv]) => level >= Number(lv))[1];
+
+  // 레벨업 감지 → 모달 + 컨페티
+  const prevLevelRef = useRef(level);
+  useEffect(() => {
+    if (level > prevLevelRef.current && prevLevelRef.current > 0) {
+      sessionStorage.setItem(`lv-${level}`, "1");
+      setLevelUp(level);
+      fireConfetti();
+    }
+    prevLevelRef.current = level;
+  }, [level]);
+
+  // 업적 정의 (전부 클라이언트 계산)
+  const commitTotal = status.repos.reduce((s, r) => s + (r.commits?.length || 0), 0);
+  const achievements = [
+    { icon: "👣", name: "첫걸음", desc: "첫 업무 기록", ok: doneDays >= 1 },
+    { icon: "🔥", name: "일주일 개근", desc: "7일 연속 기록", ok: streak >= 7 },
+    { icon: "🌋", name: "한 달 개근", desc: "30일 연속 기록", ok: streak >= 30 },
+    { icon: "💯", name: "백전백승", desc: "누적 100일", ok: doneDays >= 100 },
+    { icon: "🏆", name: "던전 클리어", desc: "Fetch 전체 완료", ok: typeof window !== "undefined" && !!localStorage.getItem("ach-dungeon") },
+    { icon: "📜", name: "첫 주간 정리", desc: "정리 생성 1회", ok: typeof window !== "undefined" && !!localStorage.getItem("ach-first-summary") },
+    { icon: "⚔️", name: "커밋 헌터", desc: "기간 내 커밋 50+", ok: commitTotal >= 50 },
+    { icon: "🌙", name: "야행성", desc: "이번 달 기록 15+", ok: monthDone >= 15 },
+  ];
+  const unlockedCount = achievements.filter((a) => a.ok).length;
+
+  // 히트맵 농도: 날짜별 메모 개수
+  const notesByDay = {};
+  for (const n of notes) {
+    const d = new Date(n.at).toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+    notesByDay[d] = (notesByDay[d] || 0) + 1;
+  }
+
   return (
     <div className="app">
+      <div className="crt-overlay" aria-hidden />
       {milestone && (
         <div className="milestone-banner" onClick={() => setMilestone(null)}>
           🏅 <b>{milestone}일 연속</b> 스트릭 달성! 자소서 소재가 쌓이고 있어요 (클릭해서 닫기)
+        </div>
+      )}
+      {levelUp && (
+        <div className="levelup-modal" onClick={() => setLevelUp(null)}>
+          <div className="levelup-box">
+            <div className="levelup-text">LEVEL UP!</div>
+            <div className="levelup-tier">
+              Lv.{levelUp} · {tier}
+            </div>
+            <div className="hint">클릭해서 닫기</div>
+          </div>
         </div>
       )}
       <aside className="sidebar">
@@ -260,6 +315,7 @@ export default function Home() {
           <h1>⚔️ LIFE LOG</h1>
           <span className="level-chip">Lv.{level}</span>
         </div>
+        <div className="tier-label">{tier} · 다음 레벨까지 {xpToNext}일</div>
         <div className="xp-bar" title={`다음 레벨까지 ${xpToNext}일`}>
           <div className="xp-fill" style={{ width: `${xpPercent}%` }} />
         </div>
@@ -300,6 +356,21 @@ export default function Home() {
             <li className="hint">아직 스캔 기록이 없습니다. Fetch 실행을 눌러주세요.</li>
           )}
         </ul>
+
+        <div className="ach-box">
+          <div className="ach-head">🏆 업적 {unlockedCount}/{achievements.length}</div>
+          <div className="ach-grid">
+            {achievements.map((a) => (
+              <span
+                key={a.name}
+                className={`ach-tile ${a.ok ? "unlocked" : ""}`}
+                title={`${a.name} — ${a.desc}${a.ok ? "" : " (잠금)"}`}
+              >
+                {a.ok ? a.icon : "🔒"}
+              </span>
+            ))}
+          </div>
+        </div>
       </aside>
 
       <main className="main">
@@ -329,8 +400,8 @@ export default function Home() {
                 c ? (
                   <span
                     key={i}
-                    className={`cal-day ${calendar[c.iso] ? "done" : ""} ${c.iso === todayIso ? "today" : ""}`}
-                    title={calendar[c.iso] ? "업무 정리 완료 ✓" : "기록 없음"}
+                    className={`cal-day done cal-l${Math.min(4, Math.max(1, notesByDay[c.iso] || 1))} ${c.iso === todayIso ? "today" : ""}`}
+                  title={`${c.iso}${calendar[c.iso] ? ` · 메모 ${notesByDay[c.iso] || 1}건` : ""}`}
                   >
                     {c.day}
                   </span>
