@@ -2,8 +2,8 @@
   "week": "2026-W34",
   "requestedAt": "2026-08-22T04:08:12.090Z",
   "startedAt": "2026-08-22T04:08:10.604Z",
-  "running": true,
-  "finishedAt": null,
+  "running": false,
+  "finishedAt": "2026-08-22T04:09:19.390Z",
   "repos": [
     {
       "name": "BookChecker",
