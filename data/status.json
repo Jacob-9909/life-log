@@ -126,7 +126,7 @@
     },
     {
       "name": "nasdaq_checker",
-      "state": "running",
+      "state": "done",
       "commits": []
     },
     {
