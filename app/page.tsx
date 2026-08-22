@@ -6,6 +6,45 @@ function authHeaders(code) {
   return { "Content-Type": "application/json", "x-access-code": code };
 }
 
+// 숫자가 스프링처럼 카운트업되는 훅
+function useCountUp(value) {
+  const [display, setDisplay] = useState(value);
+  const prevRef = useRef(value);
+  useEffect(() => {
+    const from = prevRef.current;
+    prevRef.current = value;
+    if (from === value) return;
+    const start = performance.now();
+    const dur = 600;
+    let raf;
+    const tick = (t) => {
+      const p = Math.min(1, (t - start) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setDisplay(Math.round(from + (value - from) * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return display;
+}
+
+const MILESTONES = [7, 14, 30, 50, 100];
+
+// 애니메이션 숫자 카운터
+function Stat({ value }) {
+  const n = useCountUp(value);
+  return <>{n}</>;
+}
+
+function fireConfetti() {
+  import("canvas-confetti").then(({ default: confetti }) => {
+    confetti({ particleCount: 120, spread: 75, origin: { y: 0.7 }, colors: ["#ffd166", "#34d399", "#a78bfa", "#22d3ee"] });
+    setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0 } }), 200);
+    setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1 } }), 350);
+  });
+}
+
 export default function Home() {
   const [code, setCode] = useState("");
   const [codeInput, setCodeInput] = useState("");
@@ -23,6 +62,30 @@ export default function Home() {
   const [calendar, setCalendar] = useState({});
   const [monthOffset, setMonthOffset] = useState(0);
   const [expandedRepo, setExpandedRepo] = useState(null);
+  const [milestone, setMilestone] = useState(null);
+  const wasRunningRef = useRef(false);
+  const cal = calendarGrid();
+  const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const doneDays = Object.keys(calendar).filter((k) => calendar[k]).length;
+  const monthDone = cal.cells.filter((c) => c && calendar[c.iso]).length;
+  // 레벨 시스템: 기록 5일당 1레벨
+  const level = Math.floor(doneDays / 5) + 1;
+  const xpPercent = ((doneDays % 5) / 5) * 100;
+  const xpToNext = 5 - (doneDays % 5);
+
+  // 오늘부터 거꾸로 연속 기록일 수 (스트릭)
+  const streak = (() => {
+    let n = 0;
+    const d = new Date(Date.now() + 9 * 3600 * 1000);
+    for (;;) {
+      const iso = d.toISOString().slice(0, 10);
+      if (!calendar[iso]) break;
+      n++;
+      d.setUTCDate(d.getUTCDate() - 1);
+    }
+    return n;
+  })();
+
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const chatEndRef = useRef(null);
@@ -66,6 +129,26 @@ export default function Home() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [notes.length]);
+
+  // Fetch 전체 완료 시 던전 클리어 컨페티
+  useEffect(() => {
+    if (wasRunningRef.current && !status.running && status.repos.length > 0) {
+      setTimeout(fireConfetti, 300);
+    }
+    wasRunningRef.current = !!status.running;
+  }, [status.running, status.repos.length]);
+
+  // 스트릭 마일스톤 도달 시 축하 배너 (세션당 1회)
+  useEffect(() => {
+    if (streak && MILESTONES.includes(streak)) {
+      const key = `milestone-${streak}`;
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        setMilestone(streak);
+        fireConfetti();
+      }
+    }
+  }, [streak]);
 
   async function handleGate(e) {
     e.preventDefault();
@@ -136,28 +219,6 @@ export default function Home() {
     }
     return { cells, label: `${year}년 ${month + 1}월` };
   }
-  const cal = calendarGrid();
-  const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-  const doneDays = Object.keys(calendar).filter((k) => calendar[k]).length;
-  const monthDone = cal.cells.filter((c) => c && calendar[c.iso]).length;
-  // 레벨 시스템: 기록 5일당 1레벨
-  const level = Math.floor(doneDays / 5) + 1;
-  const xpPercent = ((doneDays % 5) / 5) * 100;
-  const xpToNext = 5 - (doneDays % 5);
-
-  // 오늘부터 거꾸로 연속 기록일 수 (스트릭)
-  const streak = (() => {
-    let n = 0;
-    const d = new Date(Date.now() + 9 * 3600 * 1000);
-    for (;;) {
-      const iso = d.toISOString().slice(0, 10);
-      if (!calendar[iso]) break;
-      n++;
-      d.setUTCDate(d.getUTCDate() - 1);
-    }
-    return n;
-  })();
-
   // 게이트: 접근 코드
   if (!code) {
     return (
@@ -184,8 +245,16 @@ export default function Home() {
   const commitGroups =
     status.repos?.filter((r) => r.state === "done" && r.commits?.length > 0) ?? [];
 
+  // 저녁 6시 이후 오늘 기록 없으면 스트릭 위험 경보
+  const streakDanger = !calendar[todayIso] && new Date(Date.now() + 9 * 3600 * 1000).getUTCHours() >= 18;
+
   return (
     <div className="app">
+      {milestone && (
+        <div className="milestone-banner" onClick={() => setMilestone(null)}>
+          🏅 <b>{milestone}일 연속</b> 스트릭 달성! 자소서 소재가 쌓이고 있어요 (클릭해서 닫기)
+        </div>
+      )}
       <aside className="sidebar">
         <div className="hud-top">
           <h1>⚔️ LIFE LOG</h1>
@@ -198,12 +267,17 @@ export default function Home() {
         <button className="btn" disabled={busy || running} onClick={() => trigger("fetch")}>
           {running ? "스캔 중..." : "▶ Fetch 실행"}
         </button>
-        <div className="progress-bar">
+        <div className={`progress-bar ${running ? "boss-active" : ""}`}>
           <div
             className="progress-fill"
             style={{ width: totalCount ? `${(doneCount / totalCount) * 100}%` : "0%" }}
           />
         </div>
+        {totalCount > 0 && (
+          <div className={`quest-label ${running ? "" : "clear"}`}>
+            {running ? `⚔️ 던전 공략 중... ${doneCount}/${totalCount}` : doneCount === totalCount && doneCount > 0 ? "🏆 던전 클리어!" : ""}
+          </div>
+        )}
         <ul className="repo-list">
           {(status.repos.length ? status.repos : [])
             .slice()
@@ -268,15 +342,15 @@ export default function Home() {
           </div>
           <div className="cal-stats">
             <div className="stat-item">
-              <div className="stat-num">{monthDone}</div>
+              <div className="stat-num"><Stat value={monthDone} /></div>
               <div className="stat-label">이번 달 기록</div>
             </div>
-            <div className="stat-item">
-              <div className="stat-num">{streak}</div>
-              <div className="stat-label">연속 스트릭 🔥</div>
+            <div className={`stat-item ${streakDanger ? "danger" : ""}`}>
+              <div className="stat-num"><Stat value={streak} /></div>
+              <div className="stat-label">{streakDanger ? "⚠️ 오늘 기록 없음!" : "연속 스트릭 🔥"}</div>
             </div>
             <div className="stat-item">
-              <div className="stat-num">{doneDays}</div>
+              <div className="stat-num"><Stat value={doneDays} /></div>
               <div className="stat-label">전체 누적</div>
             </div>
           </div>

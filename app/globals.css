@@ -336,6 +336,70 @@ body {
 .hint { font-size: 12px; color: #5f6678; }
 .error-msg { color: #fb7185; font-size: 13px; }
 
+/* ===== 게임 연출 ===== */
+/* Shimmer 광택 타이틀 */
+.sidebar h1 {
+  background: linear-gradient(100deg, #a78bfa 20%, #e9d5ff 40%, #67e8f9 50%, #e9d5ff 60%, #a78bfa 80%);
+  background-size: 200% auto;
+  animation: shine 4s linear infinite;
+}
+@keyframes shine { to { background-position: -200% center; } }
+
+/* 보스 HP바 */
+.progress-bar.boss-active {
+  border-color: rgba(251, 113, 133, 0.5);
+  box-shadow: 0 0 12px rgba(251, 113, 133, 0.35);
+}
+.progress-bar.boss-active .progress-fill {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.7);
+}
+.quest-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fda4af;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  min-height: 14px;
+}
+.quest-label.clear {
+  color: #6ee7b7;
+  text-shadow: 0 0 10px rgba(110, 231, 183, 0.6);
+}
+
+/* 스트릭 위험 경보 (저녁 + 미기록) */
+.stat-item.danger .stat-num {
+  color: #fb7185 !important;
+  text-shadow: 0 0 18px rgba(251, 113, 133, 0.8);
+  animation: danger-pulse 1.2s ease-in-out infinite;
+}
+.stat-item.danger .stat-label { color: #fb7185; }
+@keyframes danger-pulse {
+  50% { opacity: 0.55; transform: scale(1.06); }
+}
+
+/* 마일스톤 배너 */
+.milestone-banner {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.15), rgba(167, 139, 250, 0.15));
+  border: 1px solid rgba(255, 209, 102, 0.5);
+  box-shadow: 0 0 30px rgba(255, 209, 102, 0.3);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: 13.5px;
+  cursor: pointer;
+  animation: banner-drop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.milestone-banner b { color: #ffd166; text-shadow: 0 0 10px rgba(255, 209, 102, 0.6); }
+@keyframes banner-drop {
+  from { transform: translateX(-50%) translateY(-80px); opacity: 0; }
+}
+
 /* 게이트 */
 .gate {
   display: flex; align-items: center; justify-content: center; height: 100vh;
