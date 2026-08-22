@@ -158,7 +158,11 @@ async function runFetch(command) {
       r.state = "done";
     } catch (e) {
       r.state = "done";
-      r.error = String(e.message).slice(0, 200);
+      // 에러 메시지에 토큰·URL이 포함될 수 있어 마스킹 후 저장
+      r.error = String(e.message)
+        .replace(/gh[pousr]_[A-Za-z0-9_]+/g, "***")
+        .replace(/https:\/\/[^@/\s]+@/g, "https://***@")
+        .slice(0, 200);
     }
     await putContent("data/status.json", status, `chore(status): ${periodLabel} ${r.name} 완료 (+${r.commits.length})`);
   }
