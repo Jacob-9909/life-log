@@ -292,7 +292,8 @@ export default function Home() {
             </span>
           </div>
           <p className="card-desc">
-            아래 보충 메모는 커밋 로그와 함께 NIM(LLM)이 주간 정리를 작성할 때 쓰입니다.
+            <b>보충 메모</b>는 "오늘 뭘 왜 고치려 했는지 + 어떤 기술을 어떻게 적용했는지"를 적는 곳입니다.
+            커밋은 <code>활동 근거</code>, 메모는 <code>목적·기술</code>로 LLM에 함께 전달돼요.
             생성 결과는 <code>~/job/docs/10_주간정리/</code>에 .md로 저장돼요.
           </p>
 
@@ -333,7 +334,7 @@ export default function Home() {
                   sendNote();
                 }
               }}
-              placeholder="보충 내용 입력... (Enter 추가)"
+              placeholder="예) 랜딩이 밋밋해서 gsap 도입 — reactbits 패턴 참고해 전역 커서·히어로 그라디언트에 적용 (Enter 추가)"
               rows={2}
             />
             <button className="btn secondary" onClick={sendNote}>+ 메모 추가</button>
