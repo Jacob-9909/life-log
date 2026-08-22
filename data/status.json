@@ -188,8 +188,11 @@
     },
     {
       "name": "t2sql-core-sunil",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "168462e|08-18 09:24|Merge pull request #30 from jasmine-kje/feature/recent",
+        "5f70062|08-18 09:15|refactor: optimize question rewrite logic to improve accuracy and reduce latency"
+      ]
     },
     {
       "name": "t2sql-package",
