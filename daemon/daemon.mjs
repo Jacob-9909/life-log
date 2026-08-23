@@ -243,7 +243,24 @@ function notify(title, body) {
   }
 }
 
+// 주간 정리 진행 상태를 status.json에 push (웹 버튼 피드백용)
+async function pushWeeklyState(patch) {
+  const cur = getContent("data/status.json")?.content ?? {};
+  const weekly = { ...(cur.weekly || {}), ...patch };
+  await putContent("data/status.json", { ...cur, weekly }, `chore(status): weekly ${patch.stage || (patch.running ? "진행 중" : patch.error ? "실패" : "완료")}`);
+}
+
 async function runWeekly(command) {
+  await pushWeeklyState({ running: true, stage: "커밋 수집 중", startedAt: new Date().toISOString(), error: null, finishedAt: null });
+  try {
+    return await runWeeklyInner(command);
+  } catch (e) {
+    await pushWeeklyState({ running: false, stage: null, error: String(e.message || e).slice(0, 300) });
+    throw e;
+  }
+}
+
+async function runWeeklyInner(command) {
   const { start, todayISO } = computeWindow();
   // 최신 커밋 다시 수집 (기간: 마지막 기록일 다음날 ~ 오늘)
   const repos = findRepos().map((r) => ({
@@ -275,6 +292,7 @@ async function runWeekly(command) {
   // NVIDIA NIM으로 서술형 요약 생성 (키 없음/실패 시 템플릿 폴백)
   let llmOk = false;
   try {
+    await pushWeeklyState({ stage: "AI 요약 생성 중 (1~5분 소요)" });
     const summary = await nimSummarize(`${start} ~ ${todayISO}`, notes, repos);
     if (summary) {
       lines.push(summary, "");
@@ -310,6 +328,7 @@ async function runWeekly(command) {
   // 웹에서 볼 수 있게 repo에도 사본 push + 소비한 메모 기록 갱신
   await putContent(`data/weekly/${baseName}.md.json`, { markdown: md }, `docs(weekly): ${baseName} 정리 생성`);
   await putContent("data/meta.json", { ...meta, lastGeneratedAt: new Date().toISOString() }, "chore(meta): 정리 생성 시각 갱신");
+  await pushWeeklyState({ running: false, stage: null, finishedAt: new Date().toISOString(), file: baseName });
 
   // 스토리뱅크 등록 초안: STAR 섹션을 별도 초안 파일에 적립
   const starMatch = md.match(/## 자소서 소재 후보[^\n]*\n([\s\S]*?)(?=\n## |$)/);

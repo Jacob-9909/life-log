@@ -57,6 +57,7 @@ export default function Home() {
     running: false,
     week: "",
     period: null as { start: string; end: string } | null,
+    weekly: null as { running?: boolean; stage?: string | null; startedAt?: string; finishedAt?: string; file?: string; error?: string | null } | null,
   });
   const [notes, setNotes] = useState([]);
   const [calendar, setCalendar] = useState({});
@@ -71,6 +72,7 @@ export default function Home() {
   const [weeklyMd, setWeeklyMd] = useState(null);
   const [editingAt, setEditingAt] = useState(null);
   const [editText, setEditText] = useState("");
+  const [weeklyPending, setWeeklyPending] = useState(false);
   const wasRunningRef = useRef(false);
   const cal = calendarGrid();
   const todayIso = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
@@ -150,6 +152,28 @@ export default function Home() {
     wasRunningRef.current = !!status.running;
   }, [status.running, status.repos.length]);
 
+  // 주간 정리 생성 완료/실패 감지 → 토스트
+  const weeklyRunning = !!status.weekly?.running;
+  const wasWeeklyRunningRef = useRef(false);
+  useEffect(() => {
+    if (weeklyRunning) {
+      setWeeklyPending(false);
+      wasWeeklyRunningRef.current = true;
+    } else if (wasWeeklyRunningRef.current && status.weekly?.startedAt) {
+      wasWeeklyRunningRef.current = false;
+      setToast(
+        status.weekly.error
+          ? { icon: "⚠️", name: "주간 정리 실패", desc: status.weekly.error }
+          : { icon: "📝", name: "주간 정리 완료!", desc: "📚 지난 정리에서 확인하세요" }
+      );
+      if (!status.weekly.error) {
+        fireConfetti();
+        fetch("/api/meta").then((r) => r.json()).then(setMeta).catch(() => {});
+      }
+      setTimeout(() => setToast(null), 6000);
+    }
+  }, [weeklyRunning, status.weekly?.startedAt]);
+
   // 레벨업 감지 → 모달 + 컨페티
   const prevLevelRef = useRef(level);
   useEffect(() => {
@@ -223,6 +247,7 @@ export default function Home() {
         body: JSON.stringify({ action }),
       });
       if (res.ok && action === "generate-weekly") {
+        setWeeklyPending(true);
         fetch("/api/meta").then((r) => r.json()).then(setMeta).catch(() => {});
       }
       if (res.ok && action === "fetch") setTimeout(loadStatus, 1500);
@@ -614,12 +639,24 @@ export default function Home() {
 
           <button
             className="btn generate"
-            disabled={busy}
+            disabled={busy || weeklyPending || weeklyRunning}
             onClick={() => trigger("generate-weekly")}
             title="마지막 정리 이후 커밋 + 위 보충 메모로 NIM이 주간 정리를 작성합니다"
           >
-            이 기간 내용으로 주간 정리 생성하기 →
+            {weeklyRunning
+              ? `⏳ ${status.weekly.stage || "생성 중"}...`
+              : weeklyPending
+                ? "📡 데몬에 명령 전달됨 (최대 15초 내 시작)"
+                : "이 기간 내용으로 주간 정리 생성하기 →"}
           </button>
+          {(weeklyRunning || weeklyPending) && (
+            <div className="hint" style={{ marginTop: 8 }}>
+              로컬 데몬이 처리 중입니다. 창을 닫아도 계속 진행돼요.
+            </div>
+          )}
+          {status.weekly?.error && !weeklyRunning && (
+            <div className="error-msg" style={{ marginTop: 8 }}>생성 실패: {status.weekly.error}</div>
+          )}
         </section>
       </main>
 
