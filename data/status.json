@@ -278,8 +278,12 @@
     },
     {
       "name": "portfolio_web",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "e75fcff|08-22 20:37|feat: light/dark theme toggle (Tokyo Night Storm/Day)",
+        "260264f|08-22 19:39|feat: agent concept reinforcement + scroll motion",
+        "cd5167c|08-22 13:53|feat: design overhaul — 2-col card layouts, terminal CLI upgrade, Storm palette"
+      ]
     },
     {
       "name": "t2s_agent",
