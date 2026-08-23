@@ -210,8 +210,34 @@
     },
     {
       "name": "midas-touch",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "83c6eb4|08-22 20:21|Merge pull request #27 from Jacob-9909/chore/post-merge-upgrades",
+        "55625c9|08-22 20:19|chore(upgrade): 머지 후 전면 점검·보완",
+        "337f1d7|08-22 19:29|docs: openwiki auto-update",
+        "694462a|08-22 19:01|Merge pull request #26 from Jacob-9909/feat/bullion-terminal-redesign",
+        "67257aa|08-22 18:53|fix(lint): ruff RUF012·RUF100 해소 — test_unit.py ClassVar 정리",
+        "2001d70|08-22 18:47|Merge pull request #25 from Jacob-9909/feat/bullion-terminal-redesign",
+        "d3b294c|08-22 18:46|fix(lint): CI eslint 에러·경고 전부 해소",
+        "0768c2e|08-22 18:00|docs: openwiki auto-update",
+        "04cbac6|08-22 17:59|docs: openwiki auto-update",
+        "ef8df7d|08-22 17:59|Merge pull request #24 from Jacob-9909/feat/bullion-terminal-redesign",
+        "883d152|08-22 17:58|fix(merge): origin/main 통합 후귀 결과 정리",
+        "4cedfef|08-22 17:40|Merge remote-tracking branch 'origin/main'",
+        "427efd2|08-22 17:18|docs(design): 이전 체계 분석 문서(Revolut) 보관",
+        "cfd81ac|08-22 17:18|chore: 공모전 제출 서류(docs/submission) gitignore 처리",
+        "01b08d4|08-22 15:34|docs(design): Bullion Terminal 디자인 시스템 문서 추가",
+        "2ce9f8f|08-22 15:34|style(design): Bullion Terminal 디자인 시스템으로 전환",
+        "5a431aa|08-22 11:44|style(design): 챗 사이드바 보조 액션을 외곽선 버튼으로 낮춤",
+        "915a984|08-22 11:42|style(design): Revolut 디자인 시스템 적용 — 두 모드 캔버스로 전환",
+        "f317190|08-21 21:58|feat(onboarding): 첫 방문자에게 번호 매긴 스포트라이트 입력 가이드",
+        "f6f025c|08-21 21:41|feat(cheongyak): 1순위 자격을 공고별로 다시 판정",
+        "e168087|08-21 21:27|feat(profile): 페르소나 선택을 걷어내고 청약 심사 기준으로 직접 입력받게 전환",
+        "ae8d3a2|08-21 20:53|refactor(home): 랜딩에서 core 무관 섹션 전부 제거",
+        "4c9ed64|08-21 20:36|feat(deploy): 무중단 워치독(keepalive.sh) + 배포 런북",
+        "6a7e0eb|08-21 20:31|fix(deploy): 공개 URL에서 챗봇이 죽는 문제 3건 수정",
+        "d7c3886|08-21 00:08|fix(mvp): 랜딩 재포지셔닝 + 부양가족 인정요건 안내 + 죽은 설정 제거"
+      ]
     },
     {
       "name": "MiniWrenAI",
