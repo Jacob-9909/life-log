@@ -309,8 +309,10 @@
     },
     {
       "name": "triplan",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "9f2c469|08-22 15:26|Initial commit from Create Next App"
+      ]
     },
     {
       "name": "wiki",
