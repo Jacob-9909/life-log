@@ -319,5 +319,12 @@
       "state": "done",
       "commits": []
     }
-  ]
+  ],
+  "weekly": {
+    "running": true,
+    "stage": "커밋 수집 중",
+    "startedAt": "2026-08-23T14:09:07.833Z",
+    "error": null,
+    "finishedAt": null
+  }
 }
