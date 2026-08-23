@@ -1,216 +1,112 @@
 {
-  "week": "08-21 ~ 08-22",
+  "week": "08-21 ~ 08-23",
   "period": {
     "start": "2026-08-21",
-    "end": "2026-08-22"
+    "end": "2026-08-23"
   },
-  "requestedAt": "2026-08-22T04:37:13.000Z",
-  "startedAt": "2026-08-22T04:37:29.014Z",
-  "running": false,
-  "finishedAt": "2026-08-22T04:38:45.490Z",
+  "requestedAt": "2026-08-23T13:45:14.812Z",
+  "startedAt": "2026-08-23T13:45:24.154Z",
+  "running": true,
+  "finishedAt": null,
   "repos": [
     {
       "name": "BookChecker",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "CoinTrading",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "DAG",
-      "state": "done",
+      "state": "pending",
+      "commits": []
+    },
+    {
+      "name": "dailynote",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "Jacob-9909",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "Langgraph_Asset",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "life-log",
-      "state": "done",
-      "commits": [
-        "8cdcc04|08-22 13:37|chore(status): 08-21 ~ 08-22 life-log 스캔 중",
-        "c9ed003|08-22 13:37|chore(status): 08-21 ~ 08-22 Langgraph_Asset 완료 (+0)",
-        "d2acca6|08-22 13:37|chore(status): 08-21 ~ 08-22 Langgraph_Asset 스캔 중",
-        "52e5ca3|08-22 13:37|chore(status): 08-21 ~ 08-22 Jacob-9909 완료 (+0)",
-        "47b1457|08-22 13:37|chore(status): 08-21 ~ 08-22 Jacob-9909 스캔 중",
-        "814c85a|08-22 13:37|chore(status): 08-21 ~ 08-22 DAG 완료 (+0)",
-        "20e51a3|08-22 13:37|chore(status): 08-21 ~ 08-22 DAG 스캔 중",
-        "d540b8d|08-22 13:37|chore(status): 08-21 ~ 08-22 CoinTrading 완료 (+0)",
-        "215d5b5|08-22 13:37|chore(status): 08-21 ~ 08-22 CoinTrading 스캔 중",
-        "a917f37|08-22 13:37|chore(status): 08-21 ~ 08-22 BookChecker 완료 (+0)",
-        "527754e|08-22 13:37|chore(status): 08-21 ~ 08-22 BookChecker 스캔 중",
-        "afd0c5c|08-22 13:37|chore(status): 08-21 ~ 08-22 스캔 시작",
-        "5558193|08-22 13:37|chore(command): fetch 2026-W34",
-        "2cdbdad|08-22 13:36|feat: 수집 기간을 마지막 기록일~오늘로 변경, 채팅을 보충 메모로 전환",
-        "1f449b5|08-22 13:29|docs(weekly): 2026-W34 정리 생성",
-        "c759f30|08-22 13:28|feat(daemon): NVIDIA NIM 연동 주간 정리 요약 생성 + 5분 타임아웃",
-        "1b95549|08-22 13:23|chore(command): generate-weekly 2026-W34",
-        "840ea73|08-22 13:19|docs(weekly): 2026-W34 정리 생성",
-        "e5ab44f|08-22 13:15|chore(command): generate-weekly 2026-W34",
-        "e9406c3|08-22 13:09|chore(status): 2026-W34 스캔 완료",
-        "2713968|08-22 13:09|chore(status): 2026-W34 wiki 완료 (+1)",
-        "491f3b9|08-22 13:09|chore(status): 2026-W34 wiki 스캔 중",
-        "eacca2f|08-22 13:09|chore(status): 2026-W34 tablefold 완료 (+0)",
-        "58b34f8|08-22 13:09|chore(status): 2026-W34 tablefold 스캔 중",
-        "715973d|08-22 13:09|chore(status): 2026-W34 t2sql-package 완료 (+10)",
-        "9db28a4|08-22 13:09|chore(status): 2026-W34 t2sql-package 스캔 중",
-        "fd19b7e|08-22 13:09|chore(status): 2026-W34 t2sql-core-sunil 완료 (+2)",
-        "461804e|08-22 13:09|chore(status): 2026-W34 t2sql-core-sunil 스캔 중",
-        "87e6cc0|08-22 13:09|chore(status): 2026-W34 t2s_agent 완료 (+0)",
-        "3de6377|08-22 13:09|chore(status): 2026-W34 t2s_agent 스캔 중",
-        "165db92|08-22 13:09|chore(status): 2026-W34 portfolio_web 완료 (+0)",
-        "4119d12|08-22 13:09|chore(status): 2026-W34 package 완료 (+0)",
-        "d0a7cd9|08-22 13:08|chore(status): 2026-W34 package 스캔 중",
-        "d295d88|08-22 13:08|chore(status): 2026-W34 nasdaq_checker 완료 (+0)",
-        "e426eaa|08-22 13:08|chore(status): 2026-W34 morethan-log 완료 (+0)",
-        "3d73bee|08-22 13:08|chore(status): 2026-W34 morethan-log 스캔 중",
-        "332d3b3|08-22 13:08|chore(status): 2026-W34 MiniWrenAI 완료 (+0)",
-        "c8f8530|08-22 13:08|chore(status): 2026-W34 MiniWrenAI 스캔 중",
-        "41919cd|08-22 13:08|chore(status): 2026-W34 midas-touch 완료 (+50)",
-        "2fe1c6c|08-22 13:08|chore(status): 2026-W34 midas-touch 스캔 중",
-        "6416b99|08-22 13:08|chore(status): 2026-W34 mallangi 완료 (+0)",
-        "6fc745e|08-22 13:08|chore(status): 2026-W34 mallangi 스캔 중",
-        "5f0db12|08-22 13:08|chore(status): 2026-W34 life-log 완료 (+56)",
-        "cef78b0|08-22 13:08|chore(status): 2026-W34 life-log 스캔 중",
-        "a906b80|08-22 13:08|chore(status): 2026-W34 Langgraph_Asset 완료 (+0)",
-        "73aac8e|08-22 13:08|chore(status): 2026-W34 Langgraph_Asset 스캔 중",
-        "50823a6|08-22 13:08|chore(status): 2026-W34 Jacob-9909 완료 (+1)",
-        "46b8852|08-22 13:08|chore(status): 2026-W34 Jacob-9909 스캔 중",
-        "6eb06a5|08-22 13:08|chore(status): 2026-W34 DAG 완료 (+0)",
-        "599c9b1|08-22 13:08|chore(status): 2026-W34 DAG 스캔 중",
-        "7eadfc0|08-22 13:08|chore(status): 2026-W34 CoinTrading 완료 (+0)",
-        "a477ba2|08-22 13:08|chore(status): 2026-W34 CoinTrading 스캔 중",
-        "09e0987|08-22 13:08|chore(status): 2026-W34 BookChecker 완료 (+0)",
-        "8958491|08-22 13:08|chore(status): 2026-W34 BookChecker 스캔 중",
-        "829246f|08-22 13:08|chore(status): 2026-W34 스캔 시작",
-        "eaa6276|08-22 13:08|chore(command): fetch 2026-W34",
-        "836d2ae|08-22 13:04|feat(ui): 달력을 중앙 상단으로 이동, 통계(스트릭) 추가, 채팅을 업무 로그로 전환",
-        "460eb38|08-22 13:00|feat(ui): 커밋 로그 유형별 요약 표시 + 펼치기/접기",
-        "55b2f8d|08-22 12:55|chore(status): 2026-W34 스캔 완료",
-        "7cc0d38|08-22 12:55|chore(status): 2026-W34 wiki 완료 (+1)",
-        "e7f7ef8|08-22 12:55|chore(status): 2026-W34 wiki 스캔 중",
-        "84887f2|08-22 12:55|chore(status): 2026-W34 tablefold 완료 (+0)",
-        "edd5b98|08-22 12:55|chore(status): 2026-W34 tablefold 스캔 중",
-        "cf21334|08-22 12:55|chore(status): 2026-W34 t2sql-package 완료 (+10)",
-        "8704208|08-22 12:55|chore(status): 2026-W34 t2sql-package 스캔 중",
-        "028c731|08-22 12:55|chore(status): 2026-W34 t2sql-core-sunil 완료 (+2)",
-        "2bd8020|08-22 12:55|chore(status): 2026-W34 t2sql-core-sunil 스캔 중",
-        "e168d67|08-22 12:55|chore(status): 2026-W34 t2s_agent 완료 (+0)",
-        "26da356|08-22 12:55|chore(status): 2026-W34 t2s_agent 스캔 중",
-        "297a885|08-22 12:55|chore(status): 2026-W34 portfolio_web 완료 (+0)",
-        "b1e6f7d|08-22 12:55|chore(status): 2026-W34 portfolio_web 스캔 중",
-        "2adf8a1|08-22 12:55|chore(status): 2026-W34 package 완료 (+0)",
-        "6761b04|08-22 12:55|chore(status): 2026-W34 package 스캔 중",
-        "a90119a|08-22 12:55|chore(status): 2026-W34 nasdaq_checker 완료 (+0)",
-        "50928ec|08-22 12:55|chore(status): 2026-W34 nasdaq_checker 스캔 중",
-        "9726595|08-22 12:55|chore(status): 2026-W34 morethan-log 완료 (+0)",
-        "183df41|08-22 12:55|chore(status): 2026-W34 morethan-log 스캔 중",
-        "3fafda1|08-22 12:55|chore(status): 2026-W34 MiniWrenAI 완료 (+0)",
-        "46dd89e|08-22 12:55|chore(status): 2026-W34 MiniWrenAI 스캔 중",
-        "9616f79|08-22 12:55|chore(status): 2026-W34 midas-touch 완료 (+50)",
-        "7a7c2e2|08-22 12:55|chore(status): 2026-W34 midas-touch 스캔 중",
-        "c015cd5|08-22 12:55|chore(status): 2026-W34 mallangi 완료 (+0)",
-        "67ec6b0|08-22 12:55|chore(status): 2026-W34 mallangi 스캔 중",
-        "baaa800|08-22 12:55|chore(status): 2026-W34 life-log 완료 (+15)",
-        "423f031|08-22 12:55|chore(status): 2026-W34 life-log 스캔 중",
-        "6b06719|08-22 12:54|chore(status): 2026-W34 Langgraph_Asset 완료 (+0)",
-        "894ccce|08-22 12:54|chore(status): 2026-W34 Langgraph_Asset 스캔 중",
-        "c507d65|08-22 12:54|chore(status): 2026-W34 Jacob-9909 완료 (+1)",
-        "124d997|08-22 12:54|chore(status): 2026-W34 Jacob-9909 스캔 중",
-        "a2048c8|08-22 12:54|chore(status): 2026-W34 DAG 완료 (+0)",
-        "9d4fd30|08-22 12:54|chore(status): 2026-W34 DAG 스캔 중",
-        "398c06d|08-22 12:54|chore(status): 2026-W34 CoinTrading 완료 (+0)",
-        "5a70f1b|08-22 12:54|chore(status): 2026-W34 CoinTrading 스캔 중",
-        "33c2c61|08-22 12:54|chore(status): 2026-W34 BookChecker 완료 (+0)",
-        "49fc773|08-22 12:54|chore(status): 2026-W34 BookChecker 스캔 중",
-        "7849603|08-22 12:54|chore(status): 2026-W34 스캔 시작",
-        "a22f888|08-22 12:54|chore(command): fetch 2026-W34",
-        "8aa482d|08-22 12:52|chore(calendar): 기존 업무일지 5일 시드",
-        "2bae7da|08-22 12:52|feat: life-log 대시보드 초기 버전"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "mallangi",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "midas-touch",
-      "state": "done",
-      "commits": [
-        "5a431aa|08-22 11:44|style(design): 챗 사이드바 보조 액션을 외곽선 버튼으로 낮춤",
-        "915a984|08-22 11:42|style(design): Revolut 디자인 시스템 적용 — 두 모드 캔버스로 전환",
-        "f317190|08-21 21:58|feat(onboarding): 첫 방문자에게 번호 매긴 스포트라이트 입력 가이드",
-        "f6f025c|08-21 21:41|feat(cheongyak): 1순위 자격을 공고별로 다시 판정",
-        "e168087|08-21 21:27|feat(profile): 페르소나 선택을 걷어내고 청약 심사 기준으로 직접 입력받게 전환",
-        "ae8d3a2|08-21 20:53|refactor(home): 랜딩에서 core 무관 섹션 전부 제거",
-        "4c9ed64|08-21 20:36|feat(deploy): 무중단 워치독(keepalive.sh) + 배포 런북",
-        "6a7e0eb|08-21 20:31|fix(deploy): 공개 URL에서 챗봇이 죽는 문제 3건 수정",
-        "d7c3886|08-21 00:08|fix(mvp): 랜딩 재포지셔닝 + 부양가족 인정요건 안내 + 죽은 설정 제거"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "MiniWrenAI",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "morethan-log",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "nasdaq_checker",
-      "state": "done",
-      "commits": [
-        "af5e4d9|08-22 13:22|feat: 일일 리포트에 상단 요약 테이블 추가 및 중립 종목 한 줄 축소"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "package",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "portfolio_web",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "t2s_agent",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "t2sql-core-sunil",
-      "state": "done",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "t2sql-package",
-      "state": "done",
-      "commits": [
-        "64d2efd|08-21 09:49|Merge pull request #30 from jasmine-kje/feature/modify"
-      ]
+      "state": "pending",
+      "commits": []
     },
     {
       "name": "tablefold",
-      "state": "done",
+      "state": "pending",
+      "commits": []
+    },
+    {
+      "name": "triplan",
+      "state": "pending",
       "commits": []
     },
     {
       "name": "wiki",
-      "state": "done",
+      "state": "pending",
       "commits": []
     }
   ]
