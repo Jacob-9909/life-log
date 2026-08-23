@@ -309,7 +309,7 @@
     },
     {
       "name": "triplan",
-      "state": "pending",
+      "state": "running",
       "commits": []
     },
     {
