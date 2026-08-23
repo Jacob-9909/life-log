@@ -246,8 +246,21 @@
     },
     {
       "name": "morethan-log",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "71553bf|08-23 22:08|Fix Sidebar imports and tag typing",
+        "7e81a93|08-23 22:06|Feed: add sticky desktop sidebar (profile, stats, top tags)",
+        "e5262a2|08-23 21:44|Feed: timeline spine grouped by month, category chips, larger thumbnail cards",
+        "3580ffa|08-23 19:28|Show post thumbnails in feed list",
+        "b066287|08-23 13:18|Redesign UI: Tailwind-based developer-notes style (header, feed list, post typography)",
+        "d3aff11|08-22 23:40|Reduce Notion update lag: revalidate every 60s and sync in-memory cache TTL",
+        "906db89|08-22 23:11|Trigger redeploy to pick up updated Notion thumbnails",
+        "b7889fe|08-22 22:14|Fall back to profile name when Notion author lookup fails; add post thumbnails",
+        "4a04c61|08-22 21:34|Normalize and dedupe post slugs at fetch time",
+        "60a0969|08-22 21:18|Upgrade notion-client to v8 and cache posts fetch",
+        "595b840|08-22 20:33|Harden index getStaticProps against Notion API failures",
+        "4d99b90|08-22 20:23|Add TOC, command palette search, archive pages, and UX polish"
+      ]
     },
     {
       "name": "nasdaq_checker",
