@@ -264,7 +264,7 @@
     },
     {
       "name": "nasdaq_checker",
-      "state": "pending",
+      "state": "running",
       "commits": []
     },
     {
