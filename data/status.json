@@ -321,11 +321,11 @@
     }
   ],
   "weekly": {
-    "running": false,
-    "stage": null,
-    "startedAt": "2026-08-28T11:30:08.946Z",
+    "running": true,
+    "stage": "커밋 수집 중",
+    "startedAt": "2026-08-29T11:30:01.588Z",
     "error": null,
-    "finishedAt": "2026-08-28T11:30:35.112Z",
+    "finishedAt": null,
     "file": "2026-08-24_2026-08-28"
   }
 }
