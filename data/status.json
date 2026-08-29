@@ -321,11 +321,11 @@
     }
   ],
   "weekly": {
-    "running": true,
-    "stage": "AI 요약 생성 중 (1~5분 소요)",
+    "running": false,
+    "stage": null,
     "startedAt": "2026-08-29T11:30:01.588Z",
     "error": null,
-    "finishedAt": null,
-    "file": "2026-08-24_2026-08-28"
+    "finishedAt": "2026-08-29T11:30:27.390Z",
+    "file": "2026-08-24_2026-08-29"
   }
 }
