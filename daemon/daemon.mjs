@@ -18,7 +18,7 @@ const JOB_DIR = process.env.JOB_DIR || path.join(HOME, "job");
 const POLL_MS = Number(process.env.POLL_MS || 15000);
 // NVIDIA NIM (OpenAI 호환 API)
 const NIM_BASE = process.env.NIM_BASE_URL || "https://integrate.api.nvidia.com/v1";
-const NIM_MODEL = process.env.NIM_MODEL || "meta/llama-3.3-70b-instruct";
+const NIM_MODEL = process.env.NIM_MODEL || "nvidia/nemotron-3-ultra-550b-a55b";
 const AUTHORS = /whjeong@didim365\.com|cj0336j@gmail\.com|Woohyuck Jeong|Jacob/;
 const API = "https://api.github.com";
 const TOKEN = process.env.GITHUB_TOKEN;
@@ -102,6 +102,7 @@ function computeWindow() {
   } catch {
     start = weekInfo().mondayISO;
   }
+  if (start > todayISO) start = todayISO;
   return { start, todayISO };
 }
 
@@ -178,7 +179,7 @@ async function runFetch(command) {
 async function nimSummarize(week, notes, repos) {
   if (!process.env.NVIDIA_API_KEY) return null;
   const material = [
-    "## 이번 주 업무 메모 (사용자 직접 입력)",
+    "## 이번 기간 업무 메모 (사용자 직접 입력)",
     ...notes.map((n) => `- [${n.at.slice(5, 10)}] ${n.text}`),
     "",
     "## Git 커밋 로그 (repo별, 형식: MM-DD HH:MM 메시지)",
@@ -198,26 +199,29 @@ async function nimSummarize(week, notes, repos) {
     },
     body: JSON.stringify({
       model: NIM_MODEL,
-      temperature: 0.3,
-      max_tokens: 2048,
+      temperature: 1,
+      top_p: 0.95,
+      max_tokens: 16384,
+      chat_template_kwargs: { enable_thinking: true },
       messages: [
         {
           role: "system",
           content:
-            "너는 취업준비 중인 개발자의 주간 업무일지 작성 도우미다. 아래 두 가지 재료의 성격이 다름을 인지하고 정리한다.\n" +
-            "- Git 커밋 로그: 실제로 수행한 활동의 객관적 근거(사실)\n" +
-            "- 보충 메모: 사용자가 오늘 무엇을 왜 업그레이드·수정하려고 했는지의 목적과 의도, 그리고 적용한 기술\n\n" +
-            "출력 규칙:\n" +
-            "1. '## 이번주 업무' 헤더 아래 repo별/주제별로 묶어 서술형 문단으로 정리한다. 단순 나열 금지.\n" +
-            "2. 커밋 로그를 근거로 '무엇을 했는지'를 기술하되, 관련 보충 메모가 있으면 그 '목적'과 연결해서 설명한다. (예: 채팅 스트리밍 UX 개선이 목적 → onStatus 콜백 연결로 구현)\n" +
-            "3. 기술을 언급할 때는 '어떤 기술을 / 어떻게 적용했는지 / 왜(어떤 문제를 풀려고)'를 함께 쓴다. 기술명만 나열하지 않는다.\n" +
-            "4. '## 자소서 소재 후보 (STAR 초안)' 헤더 아래, 기술 선택의 이유와 결과가 드러나는 소재를 1~3개 초안 작성한다. 재료가 부족하면 생략.\n" +
-            "5. 사실을 낭만화하지 않는다. 재료에 없는 일을 만들어내지 않는다. 한국어로 쓴다.",
+            "너는 개발자의 업무일지 및 주간 업무 정리 작성을 돕는 전문 AI 어시스턴트다.\n" +
+            "제공된 두 가지 재료의 성격을 정확히 파악하여 전문적이고 구조화된 문서를 작성한다.\n" +
+            "- Git 커밋 로그: 실제로 수행한 활동의 객관적 근거 (사실/Fact)\n" +
+            "- 보충 메모: 사용자가 작업의 목적, 고민, 의도, 배경 및 적용 기술을 직접 기록한 메모\n\n" +
+            "작성 가이드라인:\n" +
+            "1. '## 이번 기간 주요 업무 요약' 헤더 아래 프로젝트(repo)별로 묶어 서술형 문단으로 구조화한다. 단순 커밋 목록 나열 금지.\n" +
+            "2. 커밋 로그의 구현/수정 내역을 보충 메모의 목적 및 배경과 유기적으로 연결하여 '왜(Why), 무엇을(What), 어떻게(How)' 해결했는지 명확히 서술한다.\n" +
+            "3. 사용된 기술 스택, 아키텍처/인프라적 결정, 성능/보안/신뢰성 개선 포인트를 구체적으로 기술한다.\n" +
+            "4. '## 자소서/이력서 소재 후보 (STAR 초안)' 헤더 아래, 주요 성과나 기술적 문제해결 과정이 드러나는 STAR(Situation-Task-Action-Result) 구조의 소재를 1~3개 작성한다. (재료가 부족하면 생략 가능)\n" +
+            "5. 사실을 과장하거나 재료에 없는 내용을 창작하지 않는다. 개발 문서에 적합한 깔끔하고 전문적인 한국어로 작성한다.",
         },
-        { role: "user", content: `${week} 주간 정리 재료:\n\n${material.join("\n")}` },
+        { role: "user", content: `${week} 정리 재료:\n\n${material.join("\n")}` },
       ],
     }),
-    signal: AbortSignal.timeout(300000), // NIM 응답이 느림 — 5분 대기
+    signal: AbortSignal.timeout(300000), // NIM 응답 대기 (최대 5분)
   });
   if (!res.ok) throw new Error(`NIM ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const json = await res.json();
@@ -328,10 +332,24 @@ async function runWeeklyInner(command) {
   // 웹에서 볼 수 있게 repo에도 사본 push + 소비한 메모 기록 갱신
   await putContent(`data/weekly/${baseName}.md.json`, { markdown: md }, `docs(weekly): ${baseName} 정리 생성`);
   await putContent("data/meta.json", { ...meta, lastGeneratedAt: new Date().toISOString() }, "chore(meta): 정리 생성 시각 갱신");
+
+  // 달력(calendar.json)에 업무 정리 기록 갱신
+  try {
+    const calRemote = getContent("data/calendar.json");
+    const calendar = calRemote?.content ?? {};
+    if (!calendar[todayISO]) {
+      calendar[todayISO] = true;
+      await putContent("data/calendar.json", calendar, `chore(calendar): ${todayISO} 업무 정리 기록 완료`);
+      console.log(`[calendar] ${todayISO} 기록 완료 반영`);
+    }
+  } catch (e) {
+    console.error("[calendar] 기록 갱신 실패:", e.message || e);
+  }
+
   await pushWeeklyState({ running: false, stage: null, finishedAt: new Date().toISOString(), file: baseName });
 
   // 스토리뱅크 등록 초안: STAR 섹션을 별도 초안 파일에 적립
-  const starMatch = md.match(/## 자소서 소재 후보[^\n]*\n([\s\S]*?)(?=\n## |$)/);
+  const starMatch = md.match(/## 자소서[^\n]*\n([\s\S]*?)(?=\n## |$)/);
   if (starMatch && starMatch[1].trim()) {
     const draftPath = path.join(JOB_DIR, "docs", "03_스토리뱅크_초안.md");
     fs.appendFileSync(
@@ -345,27 +363,38 @@ async function runWeeklyInner(command) {
   console.log(`[weekly] ${outDir}/${baseName}.md 저장 완료`);
 }
 
-// ---- 시작 시: 기존 09_업무일지 파일들을 읽어 달력에 과거 기록 시드 ----
+// ---- 시작 시: 기존 09_업무일지 및 10_주간정리 파일들을 읽어 달력에 과거 기록 시드 ----
 async function seedCalendar() {
+  const days = new Set();
+  // 1. 기존 09_업무일지 (YYYY-MM-DD.md)
   const diaryDir = path.join(JOB_DIR, "docs", "09_업무일지");
-  if (!fs.existsSync(diaryDir)) return;
-  const days = fs
-    .readdirSync(diaryDir)
-    .map((f) => f.match(/^(\d{4}-\d{2}-\d{2})\.md$/)?.[1])
-    .filter(Boolean);
-  if (!days.length) return;
+  if (fs.existsSync(diaryDir)) {
+    for (const f of fs.readdirSync(diaryDir)) {
+      const m = f.match(/^(\d{4}-\d{2}-\d{2})\.md$/);
+      if (m) days.add(m[1]);
+    }
+  }
+  // 2. 기존 10_주간정리 (YYYY-MM-DD_YYYY-MM-DD.md -> 종료일자)
+  const weeklyDir = path.join(JOB_DIR, "docs", "10_주간정리");
+  if (fs.existsSync(weeklyDir)) {
+    for (const f of fs.readdirSync(weeklyDir)) {
+      const m = f.match(/^(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})\.md$/);
+      if (m) days.add(m[2]);
+    }
+  }
+  if (!days.size) return;
   const remote = getContent("data/calendar.json");
   const calendar = remote?.content ?? {};
   let added = 0;
-  for (const d of days) {
+  for (const d of Array.from(days).sort()) {
     if (!calendar[d]) {
       calendar[d] = true;
       added++;
     }
   }
   if (added) {
-    await putContent("data/calendar.json", calendar, `chore(calendar): 기존 업무일지 ${added}일 시드`);
-    console.log(`[calendar] 기존 업무일지 ${added}일을 달력에 반영`);
+    await putContent("data/calendar.json", calendar, `chore(calendar): 기존 일지/정리 ${added}일 시드`);
+    console.log(`[calendar] 기존 일지/정리 ${added}일을 달력에 반영`);
   }
 }
 

@@ -22,7 +22,7 @@
     <key>NVIDIA_API_KEY</key>
     <string>__NVIDIA_API_KEY__</string>
     <key>NIM_MODEL</key>
-    <string>meta/llama-3.3-70b-instruct</string>
+    <string>nvidia/nemotron-3-ultra-550b-a55b</string>
     <key>DISCORD_WEBHOOK_URL</key>
     <string>__DISCORD_WEBHOOK_URL__</string>
   </dict>
