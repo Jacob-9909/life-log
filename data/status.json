@@ -1,10 +1,10 @@
 {
   "weekly": {
-    "running": true,
-    "stage": "AI 요약 생성 중 (1~5분 소요)",
+    "running": false,
+    "stage": null,
     "startedAt": "2026-09-17T13:53:46.913Z",
     "error": null,
-    "finishedAt": null,
-    "file": "2026-09-16_2026-09-16"
+    "finishedAt": "2026-09-17T13:54:50.543Z",
+    "file": "2026-09-17_2026-09-17"
   }
 }
