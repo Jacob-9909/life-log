@@ -1,7 +1,7 @@
 {
   "weekly": {
     "running": true,
-    "stage": "커밋 수집 중",
+    "stage": "AI 요약 생성 중 (1~5분 소요)",
     "startedAt": "2026-09-18T11:37:33.570Z",
     "error": null,
     "finishedAt": null,
