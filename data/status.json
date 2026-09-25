@@ -1,10 +1,10 @@
 {
   "weekly": {
-    "running": false,
-    "stage": null,
-    "startedAt": "2026-09-23T11:30:10.654Z",
+    "running": true,
+    "stage": "커밋 수집 중",
+    "startedAt": "2026-09-25T06:54:56.306Z",
     "error": null,
-    "finishedAt": "2026-09-23T11:31:13.529Z",
+    "finishedAt": null,
     "file": "2026-09-23_2026-09-23"
   }
 }
