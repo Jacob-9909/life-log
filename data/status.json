@@ -26,8 +26,25 @@
     },
     {
       "name": "life-log",
-      "state": "running",
-      "commits": []
+      "state": "done",
+      "commits": [
+        "09-26 14:53|test(trigger): weekly e2e 검증",
+        "09-26 14:53|chore(status): weekly 커밋 수집 중",
+        "09-26 14:53|chore(status): weekly AI 요약 생성 중 (1~5분 소요)",
+        "09-26 14:54|docs(weekly): 2026-09-26_2026-09-26 정리 생성",
+        "09-26 14:54|chore(meta): 정리 생성 시각 갱신",
+        "09-26 14:54|chore(calendar): 2026-09-26 업무 정리 기록 완료",
+        "09-26 14:54|chore(status): weekly 완료",
+        "09-26 15:01|test(trigger): fetch 활성필터 검증",
+        "09-26 15:01|chore(status): 09-26 ~ 09-26 스캔 시작",
+        "09-26 15:01|chore(status): 09-26 ~ 09-26 DAG 스캔 중",
+        "09-26 15:01|chore(status): 09-26 ~ 09-26 DAG 완료 (+0)",
+        "09-26 15:02|chore(status): 09-26 ~ 09-26 Jacob-9909 스캔 중",
+        "09-26 15:02|chore(status): 09-26 ~ 09-26 Jacob-9909 완료 (+0)",
+        "09-26 15:02|chore(status): 09-26 ~ 09-26 kaspflow 스캔 중",
+        "09-26 15:02|chore(status): 09-26 ~ 09-26 kaspflow 완료 (+0)",
+        "09-26 15:02|chore(status): 09-26 ~ 09-26 life-log 스캔 중"
+      ]
     },
     {
       "name": "midas-touch",
