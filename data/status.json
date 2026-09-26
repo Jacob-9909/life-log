@@ -11,7 +11,7 @@
   "repos": [
     {
       "name": "DAG",
-      "state": "pending",
+      "state": "running",
       "commits": []
     },
     {
