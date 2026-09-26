@@ -1,0 +1,19 @@
+[Unit]
+Description=life-log daemon (GitHub API version)
+After=network-online.target
+Wants=network-online.target
+# 네트워크 일시 장애로 죽어도 무한 재시작하도록 (start-limit 완화)
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# 환경변수(토큰/API키)는 별도 파일에서 로드 — 유닛 파일에 비밀을 두지 않는다.
+EnvironmentFile=%h/.config/life-log/daemon.env
+ExecStart=/usr/bin/env node %h/life-log/daemon/daemon.github.mjs
+Restart=always
+RestartSec=10
+StandardOutput=append:%h/life-log/daemon/logs/stdout.log
+StandardError=append:%h/life-log/daemon/logs/stderr.log
+
+[Install]
+WantedBy=default.target
