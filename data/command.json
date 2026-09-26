@@ -1,5 +1,5 @@
 {
-  "action": "generate-weekly",
+  "action": "fetch",
   "week": "test",
-  "requestedAt": "2026-09-26T05:53:27.000Z"
+  "requestedAt": "2026-09-26T06:01:41.100Z"
 }
