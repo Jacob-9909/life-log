@@ -6,8 +6,8 @@
   },
   "requestedAt": "2026-09-26T06:01:41.100Z",
   "startedAt": "2026-09-26T06:01:55.049Z",
-  "running": true,
-  "finishedAt": null,
+  "running": false,
+  "finishedAt": "2026-09-26T06:02:20.679Z",
   "repos": [
     {
       "name": "DAG",
