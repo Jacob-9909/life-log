@@ -32,6 +32,8 @@ const NIM_BASE = process.env.NIM_BASE_URL || "https://integrate.api.nvidia.com/v
 const NIM_MODEL = process.env.NIM_MODEL || "nvidia/nemotron-3-ultra-550b-a55b";
 const API = "https://api.github.com";
 const TOKEN = process.env.GITHUB_TOKEN;
+// 커밋이 없어도 "최근 push된" repo 는 목록에 포함 (활성 repo 노이즈 컷 기준, 일)
+const ACTIVE_DAYS = Number(process.env.ACTIVE_DAYS || 60);
 
 // 커밋 저자 매칭 (GitHub API 는 author=email 파라미터로 필터. 이름 매칭은 클라이언트에서 보강)
 const AUTHOR_EMAILS = (process.env.AUTHOR_EMAILS || "whjeong@didim365.com,cj0336j@gmail.com")
@@ -145,11 +147,18 @@ async function listGitHubRepos() {
     if (!Array.isArray(arr) || arr.length === 0) break;
     for (const r of arr) {
       if (r.fork) continue; // 포크는 제외 (내 커밋 아님)
-      repos.push({ name: r.name, full: r.full_name });
+      repos.push({ name: r.name, full: r.full_name, pushedAt: r.pushed_at || null });
     }
     if (arr.length < 100) break;
   }
   return repos.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// 최근 ACTIVE_DAYS 이내 push된 repo 인지 (커밋 없어도 목록에 포함할 활성 repo 판정)
+function isRecentlyActive(repo) {
+  if (!repo.pushedAt) return false;
+  const ageDays = (Date.now() - new Date(repo.pushedAt).getTime()) / 86400000;
+  return ageDays <= ACTIVE_DAYS;
 }
 
 // ---- 특정 repo 에서 기간+저자 필터로 커밋 조회 ----
@@ -207,7 +216,10 @@ async function runFetch(command) {
   const { start, todayISO } = await computeWindow();
   const periodLabel = `${start.slice(5)} ~ ${todayISO.slice(5)}`;
   console.log(`[fetch] 수집 기간: ${start} ~ ${todayISO}`);
-  const repos = await listGitHubRepos();
+  const allRepos = await listGitHubRepos();
+  // 활성 repo(최근 push)만 대상 — 방치된 repo 노이즈 컷. 커밋=push 이므로 기간 내 커밋 있으면 반드시 활성.
+  const repos = allRepos.filter(isRecentlyActive);
+  console.log(`[fetch] 활성 repo ${repos.length}/${allRepos.length}개 스캔 (최근 ${ACTIVE_DAYS}일)`);
   const status = {
     week: periodLabel,
     period: { start, end: todayISO },
@@ -334,8 +346,8 @@ async function runWeeklyInner(command) {
     console.error("[job] pull 경고:", e.message);
   }
 
-  // GitHub API 로 커밋 수집
-  const ghRepos = await listGitHubRepos();
+  // GitHub API 로 커밋 수집 (활성 repo만 — fetch 와 동일 기준)
+  const ghRepos = (await listGitHubRepos()).filter(isRecentlyActive);
   const repos = [];
   for (const r of ghRepos) {
     let commits = [];

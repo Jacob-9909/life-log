@@ -573,7 +573,7 @@ export default function Home() {
           <p className="card-desc">
             <b>보충 메모</b>는 "오늘 뭘 왜 고치려 했는지 + 어떤 기술을 어떻게 적용했는지"를 적는 곳입니다.
             커밋은 <code>활동 근거</code>, 메모는 <code>목적·기술</code>로 LLM에 함께 전달돼요.
-            생성 결과는 <code>~/job/docs/10_주간정리/</code>에 .md로 저장돼요.
+            생성 결과는 <code>job repo의 docs/10_주간정리/</code>에 .md로 저장·커밋돼요.
           </p>
 
           <ul className="memo-list">
@@ -651,7 +651,7 @@ export default function Home() {
           </button>
           {(weeklyRunning || weeklyPending) && (
             <div className="hint" style={{ marginTop: 8 }}>
-              로컬 데몬이 처리 중입니다. 창을 닫아도 계속 진행돼요.
+              데몬이 처리 중입니다. 창을 닫아도 계속 진행돼요.
             </div>
           )}
           {status.weekly?.error && !weeklyRunning && (

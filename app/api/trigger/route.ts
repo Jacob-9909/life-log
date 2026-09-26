@@ -4,7 +4,7 @@ import { weekKeyKST } from "../../../lib/week";
 
 export const runtime = "nodejs";
 
-// 로컬 데몬에 명령 전달: fetch(주간 스캔) 또는 generate-weekly(주간 정리 md 생성)
+// 데몬에 명령 전달: fetch(주간 스캔) 또는 generate-weekly(주간 정리 md 생성)
 export async function POST(req) {
   const code = req.headers.get("x-access-code");
   if (!process.env.ACCESS_CODE || code !== process.env.ACCESS_CODE) {
