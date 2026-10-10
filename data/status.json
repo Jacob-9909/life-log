@@ -63,11 +63,11 @@
     }
   ],
   "weekly": {
-    "running": false,
-    "stage": null,
-    "startedAt": "2026-10-09T11:30:03.989Z",
+    "running": true,
+    "stage": "커밋 수집 중",
+    "startedAt": "2026-10-10T11:30:03.173Z",
     "error": null,
-    "finishedAt": "2026-10-09T11:30:48.057Z",
+    "finishedAt": null,
     "file": "2026-10-09_2026-10-09"
   }
 }
