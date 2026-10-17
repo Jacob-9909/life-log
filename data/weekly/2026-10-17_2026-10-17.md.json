@@ -1,0 +1,3 @@
+{
+  "markdown": "# 업무 정리 (2026-10-17 ~ 2026-10-17)\n\n> 생성: 2026-10-17 · life-log 대시보드에서 자동 생성 (LLM: nvidia/nemotron-3-ultra-550b-a55b)\n\n## 기간 업무\n\n(입력된 보충 메모 없음)\n## Git 커밋 요약\n\n### kaspflow — 5건\n\n```\nfeat(news): 뉴스·감정 시그널 파이프라인 (M1~M5 + M3 라벨링 도구)\nfix(backend): 이미지에 뉴스 모듈(features, news_features, news_queries) 포함\nci(backend): 운영 이미지 안에서 app import 검사\nci(signal-worker): Laya 포함 이미지로 빌드 (M3 준비, VM 은 LAYA_ENABLED=false 유지)\ndocs(news): VM 실측 반영 (M3 분류 켬, 메모리·처리 속도)\n```\n\n### life-log — 1건\n\n```\nchore(status): weekly 커밋 수집 중\n```\n"
+}
